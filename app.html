@@ -7,6 +7,7 @@
 :root{
   --bg:#EEF2F1; --surface:#FFFFFF; --surface-2:#E3E9E7; --ink:#152024; --muted:#55666A; --line:#D0D9D7;
   --accent:#2445C4; --accent-ink:#FFFFFF; --accent-soft:#DCE3FA;
+  --cal:#1D4ED8; --cal-line:#1D4ED8;
   --s-new:#98A4A7; --s-learning:#CF4F2C; --s-fresh:#DD7A2B; --s-shaky:#D49412; --s-okay:#8FA22A; --s-good:#2C9080; --s-solid:#1B7A4E; --s-master:#4B3FB0;
   --ok:#1D8556; --bad:#C23D27;
   --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
@@ -17,12 +18,14 @@
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
   --bg:#0F1517; --surface:#172023; --surface-2:#1F2A2D; --ink:#E4EBEA; --muted:#93A3A6; --line:#2A3639;
   --accent:#8099FF; --accent-ink:#0D1430; --accent-soft:#232E55;
+  --cal:#1E40AF; --cal-line:#3B82F6;
   --s-new:#6E7B7E; --s-learning:#F07454; --s-fresh:#F39A52; --s-shaky:#EDB43C; --s-okay:#BCD05A; --s-good:#4DBDA9; --s-solid:#62C792; --s-master:#9A90F5;
   --ok:#4CC88A; --bad:#F2715A; color-scheme:dark;
 }}
 :root[data-theme="dark"]{
   --bg:#0F1517; --surface:#172023; --surface-2:#1F2A2D; --ink:#E4EBEA; --muted:#93A3A6; --line:#2A3639;
   --accent:#8099FF; --accent-ink:#0D1430; --accent-soft:#232E55;
+  --cal:#1E40AF; --cal-line:#3B82F6;
   --s-new:#6E7B7E; --s-learning:#F07454; --s-fresh:#F39A52; --s-shaky:#EDB43C; --s-okay:#BCD05A; --s-good:#4DBDA9; --s-solid:#62C792; --s-master:#9A90F5;
   --ok:#4CC88A; --bad:#F2715A; color-scheme:dark;
 }
@@ -248,12 +251,13 @@ button.brand{background:none;border:0;padding:4px 2px;color:inherit;cursor:point
 .calpanel{display:grid;gap:10px;margin-top:6px}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
 .cal-h{font-size:11px;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.06em}
-.cal-d{border:1px solid var(--line);border-radius:8px;padding:5px 6px;min-height:50px;display:grid;align-content:space-between;text-align:left;font:inherit;color:var(--ink);background:color-mix(in srgb,var(--accent) var(--a,0%),var(--surface));min-width:0}
+.cal-d{border:1px solid var(--line);border-radius:8px;padding:5px 6px;min-height:50px;display:grid;align-content:space-between;text-align:left;font:inherit;color:var(--ink);background:color-mix(in srgb,var(--cal) var(--a,0%),var(--surface));min-width:0}
+.cal-d.hi{color:#fff} .cal-d.hi .dn{color:rgba(255,255,255,.8)}
 .cal-d.past{visibility:hidden}
 .cal-d .dn{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden}
 .cal-d b{font-size:15px;font-variant-numeric:tabular-nums;justify-self:end}
-.cal-d.today{border-color:var(--accent)} .cal-d.today .dn{color:var(--accent);font-weight:700}
-.cal-d.sel{box-shadow:inset 0 0 0 2px var(--accent)}
+.cal-d.today{border-color:var(--cal-line)} .cal-d.today .dn{color:var(--cal-line);font-weight:700} .cal-d.today.hi .dn{color:#fff}
+.cal-d.sel{box-shadow:inset 0 0 0 2px var(--cal-line)}
 .caldetail{font-size:13px;margin:0}
 .dc-stack{height:12px;border-radius:6px;margin-top:2px}
 .stack>span{background:var(--c);min-width:0}
@@ -1356,7 +1360,7 @@ function dueCalendar(){
     <p class="muted" style="font-size:13px">Alle Decks zusammen, ohne neue Wörter. „Heute“ enthält Überfälliges. Nächste 7 Tage: <b class="num">${sum(7)}</b> · nächste 4 Wochen: <b class="num">${sum(28)}</b></p>
     <div class="cal">${['Mo','Di','Mi','Do','Fr','Sa','So'].map(x=>`<span class="cal-h">${x}</span>`).join('')}
     ${days.map(x=>{if(x.ts<sod)return'<span class="cal-d past"></span>';const fi=future.indexOf(x),lbl=(x.dt.getDate()===1||fi===0?x.dt.getDate()+'.'+(x.dt.getMonth()+1)+'.':x.dt.getDate()+'.');
-      return`<button class="cal-d${x.ts===sod?' today':''}${fi===si?' sel':''}" data-cal="${fi}" style="--a:${x.n?Math.round(8+x.n/max*47):0}%" aria-label="${fmtD(x.dt)}: ${x.n} fällig"><span class="dn">${lbl}</span><b>${x.n||''}</b></button>`}).join('')}</div>
+      const a=x.n?Math.round(12+x.n/max*78):0;return`<button class="cal-d${x.ts===sod?' today':''}${fi===si?' sel':''}${a>=50?' hi':''}" data-cal="${fi}" style="--a:${a}%" aria-label="${fmtD(x.dt)}: ${x.n} fällig"><span class="dn">${lbl}</span><b>${x.n||''}</b></button>`}).join('')}</div>
     <p class="caldetail"><span class="muted">${sel.ts===sod?'Heute':fmtD(sel.dt)}:</span> ${detail}</p></div>`;
 }
 function renderWords(){
