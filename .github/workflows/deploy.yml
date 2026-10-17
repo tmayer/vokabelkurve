@@ -1,0 +1,64 @@
+# Prüft die App bei jedem Push und spielt sie bei Änderungen auf main per SFTP nach IONOS.
+# Benötigte Secrets (Settings → Secrets and variables → Actions):
+#   IONOS_SFTP_HOST         z. B. access-1234567890.webspace-host.com
+#   IONOS_SFTP_USER         SFTP-Benutzer aus dem IONOS-Kundenbereich
+#   IONOS_SFTP_PASSWORD     zugehöriges Passwort
+#   IONOS_TARGET_DIR        Zielordner auf dem Webspace, z. B. /tools/vocab
+#   IONOS_KNOWN_HOSTS       Ausgabe von: ssh-keyscan -p 22 <IONOS_SFTP_HOST>
+# Nie überschrieben oder gelöscht werden: api/config.php (Hash des Geräteschlüssels) und data/ (Lernstand).
+name: Prüfen und deployen
+
+on:
+  push:
+    branches: [main]
+    paths: ['webspace/**', 'werkzeuge/decks_pruefen.py', '.github/workflows/deploy.yml']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ionos
+  cancel-in-progress: false
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP-Syntax
+        run: for f in webspace/api/*.php; do php -l "$f"; done
+      - name: Decks
+        run: python3 werkzeuge/decks_pruefen.py webspace/decks
+
+  deployen:
+    needs: pruefen
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: ionos
+    steps:
+      - uses: actions/checkout@v4
+      - name: lftp installieren
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+      - name: Hostschlüssel hinterlegen
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.IONOS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+      - name: Per SFTP hochladen
+        env:
+          HOST: ${{ secrets.IONOS_SFTP_HOST }}
+          USER: ${{ secrets.IONOS_SFTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.IONOS_SFTP_PASSWORD }}
+          DIR: ${{ secrets.IONOS_TARGET_DIR }}
+        run: |
+          # 1) App ohne Löschen spiegeln; config.php und data/ bleiben unberührt
+          # 2) decks/ mit Löschen spiegeln, damit entfernte Decks auch auf dem Server verschwinden
+          lftp --env-password -u "$USER" "sftp://$HOST" -e "
+            set sftp:auto-confirm no;
+            set net:max-retries 2;
+            mirror --reverse --verbose \
+              --exclude-glob .DS_Store --exclude ^api/config\.php$ --exclude ^data/ \
+              webspace/ '$DIR/';
+            mirror --reverse --verbose --delete \
+              --exclude-glob .DS_Store \
+              webspace/decks/ '$DIR/decks/';
+            quit"

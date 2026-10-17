@@ -1,0 +1,12 @@
+# Geheimnisse: nie ins Repository
+GERAETESCHLUESSEL.txt
+webspace/api/config.php
+
+# Lernstand (liegt nur auf dem Server bzw. lokal beim Testserver)
+testdaten/
+webspace/data/*
+!webspace/data/.htaccess
+
+# macOS / Python
+.DS_Store
+__pycache__/

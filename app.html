@@ -1,0 +1,1742 @@
+<title>Vokabelkurve</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap">
+<style>
+/* Layout: eine App-Spalte (max. 1080px) mit Tab-Leiste; Lernkarte zentriert, Überblick als zweispaltiges Raster, das auf dem Handy einspaltig wird */
+:root{
+  --bg:#EEF2F1; --surface:#FFFFFF; --surface-2:#E3E9E7; --ink:#152024; --muted:#55666A; --line:#D0D9D7;
+  --accent:#2445C4; --accent-ink:#FFFFFF; --accent-soft:#DCE3FA;
+  --s-new:#98A4A7; --s-learning:#CF4F2C; --s-fresh:#DD7A2B; --s-shaky:#D49412; --s-okay:#8FA22A; --s-good:#2C9080; --s-solid:#1B7A4E; --s-master:#4B3FB0;
+  --ok:#1D8556; --bad:#C23D27;
+  --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1517; --surface:#172023; --surface-2:#1F2A2D; --ink:#E4EBEA; --muted:#93A3A6; --line:#2A3639;
+  --accent:#8099FF; --accent-ink:#0D1430; --accent-soft:#232E55;
+  --s-new:#6E7B7E; --s-learning:#F07454; --s-fresh:#F39A52; --s-shaky:#EDB43C; --s-okay:#BCD05A; --s-good:#4DBDA9; --s-solid:#62C792; --s-master:#9A90F5;
+  --ok:#4CC88A; --bad:#F2715A; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0F1517; --surface:#172023; --surface-2:#1F2A2D; --ink:#E4EBEA; --muted:#93A3A6; --line:#2A3639;
+  --accent:#8099FF; --accent-ink:#0D1430; --accent-soft:#232E55;
+  --s-new:#6E7B7E; --s-learning:#F07454; --s-fresh:#F39A52; --s-shaky:#EDB43C; --s-okay:#BCD05A; --s-good:#4DBDA9; --s-solid:#62C792; --s-master:#9A90F5;
+  --ok:#4CC88A; --bad:#F2715A; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+/* Nie breiter als das Fenster: Raster-Spalten und ihre Kinder dürfen schmaler werden als ihr Inhalt.
+   Lange Inhalte brechen um, werden gekürzt oder scrollen in ihrem eigenen Kasten. */
+body{overflow-wrap:break-word}
+section.view,.card,.prose,.panel,.feedback,.chart,.nextpanel,.dialog,.headline,.dirstat{grid-template-columns:minmax(0,1fr)}
+section.view>*,.card>*,.prose>*,.panel>*,.feedback>*,.chart>*,.nextpanel>*,.dialog>*,.row>*,.learnbar>*{min-width:0}
+.formula,.tablewrap{max-width:100%}
+.deckpick{min-width:0}
+.deckpick select{min-width:0;text-overflow:ellipsis}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h2{font-size:22px;font-weight:700}
+h3{font-size:16px;font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.mono,.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Kopfzeile */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top-inner{max-width:1080px;margin:0 auto;padding:4px 16px 0;display:flex;flex-wrap:nowrap;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-weight:700;font-size:18px;flex:none}
+.brand svg{flex:none}
+.deckpick{display:flex;align-items:center;gap:8px;min-width:0}
+.deckpick select{max-width:240px}
+.tabs{flex:1 1 auto;min-width:0;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tab .short{display:none}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:8px 12px 10px;color:var(--muted);font-weight:700;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+@media (hover:hover) and (pointer:fine){.tab:hover{color:var(--ink)}}
+
+select,input[type=text],input[type=number],textarea{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+textarea{width:100%;font-family:var(--f-mono);font-size:12.5px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;font-weight:700}
+@media (hover:hover) and (pointer:fine){.btn:hover{border-color:var(--muted)}}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+@media (hover:hover) and (pointer:fine){.btn.primary:hover{filter:brightness(1.08)}}
+.btn.ghost{background:none}
+.btn.danger{color:var(--bad)}
+.btn.small{padding:5px 10px;font-size:13px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 12px;font-weight:700;color:var(--muted);font-size:13.5px}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--ink)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+section.view{padding-top:22px;display:grid;gap:18px}
+
+/* Status */
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.pill::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+.st-new{--c:var(--s-new)} .st-learning{--c:var(--s-learning)} .st-fresh{--c:var(--s-fresh)} .st-shaky{--c:var(--s-shaky)} .st-okay{--c:var(--s-okay)} .st-good{--c:var(--s-good)} .st-solid{--c:var(--s-solid)} .st-master{--c:var(--s-master)}
+.fill-new{fill:var(--s-new)} .fill-learning{fill:var(--s-learning)} .fill-fresh{fill:var(--s-fresh)} .fill-shaky{fill:var(--s-shaky)} .fill-okay{fill:var(--s-okay)} .fill-good{fill:var(--s-good)} .fill-solid{fill:var(--s-solid)} .fill-master{fill:var(--s-master)}
+.g0{--c:var(--muted)} .g1{--c:var(--bad)} .g2{--c:var(--s-shaky)} .g3{--c:var(--s-good)} .g4{--c:var(--accent)}
+
+.foot{max-width:1080px;margin:0 auto;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px 20px;border-top:1px solid var(--line)}
+.sync{font-size:12.5px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.sync::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.sync{--c:var(--s-new)} .sync[data-state="ok"]{--c:var(--s-good)} .sync[data-state="saving"]{--c:var(--s-shaky)} .sync[data-state="error"]{--c:var(--bad);color:var(--bad)}
+
+/* Lernen */
+.learnbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.progress{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;flex:1 1 200px;max-width:420px}
+.progress>i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 24px 24px;max-width:680px;width:100%;margin:0 auto;display:grid;gap:22px}
+.card-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.prompt{--pfs:clamp(30px,6vw,46px);font-family:var(--f-display);font-weight:700;font-size:var(--pfs);height:calc(var(--pfs) * 1.25);line-height:calc(var(--pfs) * 1.25);margin-top:8px;white-space:nowrap;overflow:hidden;text-align:center}
+.prompt.two-line{white-space:normal;display:flex;align-items:center;justify-content:center;line-height:1.1}
+.prompt-sub{text-align:center;color:var(--muted);font-size:13.5px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;align-items:center;gap:14px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:12px 14px;font-size:17px;transition:border-color .12s,background .12s}
+@media (hover:hover) and (pointer:fine){.opt:hover:not([aria-disabled]){border-color:var(--accent);background:var(--accent-soft)}}
+.opt kbd{font-family:var(--f-mono);font-size:12px;width:24px;height:24px;display:inline-grid;place-items:center;border:1px solid var(--line);border-radius:6px;color:var(--muted);flex:none}
+.opt[aria-disabled]{cursor:pointer}
+.opt.is-right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 13%,var(--surface))}
+.opt.is-wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--surface))}
+.opt.is-dim{opacity:.55}
+.dunno{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:6px;width:100%;border:1px dashed color-mix(in srgb,var(--bad) 60%,var(--line));background:color-mix(in srgb,var(--bad) 7%,transparent);color:var(--bad);border-radius:10px;padding:9px 14px;font-size:15px;font-weight:600}
+.dunno kbd{font-family:var(--f-mono);font-size:12px;width:24px;height:24px;display:inline-grid;place-items:center;border:1px solid var(--line);border-radius:6px;color:var(--muted);font-weight:400}
+.dunno[aria-disabled]{opacity:.4}
+@media (hover:hover) and (pointer:fine){.dunno:hover:not([aria-disabled]){background:color-mix(in srgb,var(--bad) 14%,transparent)}}
+.feedback{display:grid;gap:14px;border-top:1px solid var(--line);padding-top:18px}
+.verdict{font-weight:700;font-size:16px}
+.verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
+.grades{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.grade{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 6px;display:grid;gap:2px;text-align:center}
+.grade b{font-size:13.5px}
+.grade span{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.grade[aria-pressed="true"]{border-color:var(--c);box-shadow:inset 0 0 0 1px var(--c);background:color-mix(in srgb,var(--c) 10%,var(--surface))}
+.readout{font-family:var(--f-mono);font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 16px}
+.readout b{color:var(--ink);font-weight:600}
+.hint{font-size:12.5px;color:var(--muted);text-align:center}
+.center-msg{max-width:620px;margin:0 auto;text-align:center;display:grid;gap:14px;justify-items:center;padding:24px 0}
+
+/* Überblick */
+.headline{display:grid;gap:6px}
+.headline .big{font-family:var(--f-display);font-size:clamp(24px,4vw,34px);font-weight:700;line-height:1.15}
+.headline .big em{font-style:normal;color:var(--accent)}
+.stack{display:flex;height:34px;border-radius:8px;overflow:hidden;background:var(--surface-2)}
+.stack>div{background:var(--c);min-width:0;transition:flex-grow .3s}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 10px}
+.kpi{display:grid;gap:2px}
+.kpi .n{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .p{font-size:12.5px;color:var(--muted);line-height:1.35}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.chart{display:grid;gap:10px;min-width:0}
+.chart svg{width:100%;height:auto;display:block}
+.chart .cap{font-size:13px;color:var(--muted)}
+svg text{fill:var(--muted);font-family:var(--f-body);font-variant-numeric:tabular-nums}
+@media (max-width:760px){svg text{font-size:14px}}
+svg .gridline{stroke:var(--line);stroke-width:1}
+svg .axis{stroke:var(--muted);stroke-width:1}
+svg .bar{fill:var(--accent)}
+svg .bar-soft{fill:var(--accent-soft)}
+svg .bar-ok{fill:var(--s-good)} svg .bar-bad{fill:var(--s-learning)}
+svg .target{stroke:var(--ink);stroke-dasharray:4 4;stroke-width:1;opacity:.6}
+svg .curve{fill:none;stroke-width:2}
+svg .c0{stroke:var(--accent)} svg .c1{stroke:var(--s-good)}
+svg .dot{stroke:var(--surface);stroke-width:1.5}
+svg .lbl{fill:var(--ink)}
+.rbars{display:grid;gap:10px}
+.rbrow{display:grid;grid-template-columns:minmax(0,9.5em) minmax(24px,1fr) max-content;gap:10px;align-items:center}
+.rbrow>div:first-child{display:grid;line-height:1.25}
+.rbrow>div:first-child b{font-size:14px}
+.rbrow>div:first-child span{font-size:12px;color:var(--muted)}
+.rbtrack{height:14px;background:var(--surface-2);border-radius:7px;overflow:hidden}
+.rbtrack i{display:block;height:100%;border-radius:7px;min-width:3px}
+.rbn{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;min-width:3ch}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px}
+.trouble{display:grid;gap:0}
+.trouble div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);align-items:center}
+.trouble div:last-child{border-bottom:0}
+
+/* Wörter */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:700;background:var(--surface);position:sticky;top:0}
+th button{background:none;border:0;padding:0;font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit}
+td.num,th.num{text-align:right}
+tbody tr{cursor:pointer}
+@media (hover:hover) and (pointer:fine){tbody tr:hover{background:var(--surface-2)}}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;font-weight:700;display:inline-flex;gap:6px;align-items:center}
+.chip[aria-pressed="true"]{border-color:var(--ink)}
+.rbar{display:inline-block;width:46px;height:6px;background:var(--surface-2);border-radius:3px;vertical-align:middle;margin-right:6px;overflow:hidden}
+.rbar>i{display:block;height:100%;background:var(--accent)}
+
+/* Detail-Overlay */
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 40%,transparent);z-index:20;display:grid;place-items:center;padding:16px}
+.dialog{background:var(--surface);border-radius:14px;border:1px solid var(--line);max-width:760px;width:100%;max-height:calc(100% - 32px);overflow:auto;padding:22px;display:grid;gap:16px}
+.dirstats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.dirstat{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:6px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:13px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--f-mono)}
+
+/* Daten */
+.drop{border:2px dashed var(--line);border-radius:12px;padding:26px;text-align:center;display:grid;gap:8px;justify-items:center;background:var(--surface)}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.field{display:grid;gap:4px;font-size:13px;color:var(--muted);font-weight:700}
+.field input,.field select{font-weight:400;color:var(--ink)}
+.decklist{display:grid;gap:0}
+.deckrow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.deckrow:last-child{border-bottom:0}
+.deckrow .grow{flex:1 1 220px;min-width:0}
+
+/* Algorithmus */
+.prose{max-width:68ch;display:grid;gap:12px}
+.mathcards{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+.mathcard{background:var(--surface-2);border-radius:10px;padding:12px 14px;display:grid;gap:6px;min-width:0;grid-template-columns:minmax(0,1fr)}
+.mathcard h4{margin:0;font-size:13.5px;font-weight:700}
+.mathcard p{font-size:13.5px;color:var(--muted)}
+.mathbox{overflow-x:auto;overflow-y:hidden;max-width:100%;padding:4px 0;scrollbar-width:none}
+.mathbox::-webkit-scrollbar{display:none}
+.mathbox math{font-size:1.2em;color:var(--ink);margin:2px 0}
+@media (max-width:760px){.mathbox math{font-size:1.05em}}
+.formula{font-family:var(--f-mono);font-size:13px;background:var(--surface-2);border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:pre}
+.cmp{width:100%}
+.cmp td,.cmp th{white-space:normal;vertical-align:top}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:700;z-index:30;max-width:calc(100% - 32px)}
+
+/* Weiter-Leiste: klebt am unteren Bildschirmrand, damit niemand scrollen muss */
+.nextbar{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:680px;width:100%;margin:0 auto;z-index:3}
+.next{width:100%;position:relative;overflow:hidden;padding:15px 16px;font-size:17px;border-radius:12px;display:flex;justify-content:center;align-items:center;gap:10px;box-shadow:0 6px 18px color-mix(in srgb,var(--ink) 18%,transparent)}
+.next kbd{font-family:var(--f-mono);font-size:11.5px;border:1px solid color-mix(in srgb,var(--accent-ink) 45%,transparent);border-radius:5px;padding:1px 6px;font-weight:400}
+.next.auto::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:0;background:var(--accent-ink);opacity:.55;animation:autofill var(--auto) linear forwards}
+@keyframes autofill{to{width:100%}}
+.card.answered{cursor:pointer}
+.card-head{flex-wrap:nowrap}
+.stats{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 6px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stats b{color:var(--ink);font-weight:700}
+.btn{white-space:nowrap}
+.learnbar>.row:last-child{flex:none}
+.learnbar{flex-wrap:nowrap;align-items:flex-start}
+@media (max-width:760px){.stats .long{display:none}}
+@media (max-width:400px){.stats .streak{flex-basis:100%;font-size:12.5px}.stats .streak .dot{display:none}}
+.todaybar{display:flex;flex-wrap:nowrap;gap:6px;margin-top:-6px;max-width:680px;width:100%;justify-self:center;overflow:hidden}
+.todaybar>*{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--surface)}
+.todaybar>button{cursor:pointer}
+.todaybar b{color:var(--ink);font-variant-numeric:tabular-nums}
+.todaybar>button:first-child b{color:var(--bad)}
+.duecell{white-space:nowrap;font-variant-numeric:tabular-nums}
+.duecell small{display:block;font-size:11px;color:var(--muted);font-weight:400}
+.due-now{color:var(--bad);font-weight:700}
+.due-today{color:var(--s-shaky);font-weight:700}
+button.brand{background:none;border:0;padding:4px 2px;color:inherit;cursor:pointer;border-radius:8px}
+.decksum{display:grid;gap:6px}
+.deckcards{display:grid;gap:10px}
+.deckcard{display:grid;gap:6px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;width:100%;min-width:0}
+.deckcard.active{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.dc-name{font-family:var(--f-display);font-weight:700;font-size:17px;display:flex;gap:8px;align-items:center;min-width:0;overflow-wrap:anywhere}
+.dc-tag{font-family:var(--f-body);font-size:11.5px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;flex:none}
+.dc-sub{font-size:13px;color:var(--muted)}
+.calpanel{display:grid;gap:10px;margin-top:6px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal-h{font-size:11px;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.06em}
+.cal-d{border:1px solid var(--line);border-radius:8px;padding:5px 6px;min-height:50px;display:grid;align-content:space-between;text-align:left;font:inherit;color:var(--ink);background:color-mix(in srgb,var(--accent) var(--a,0%),var(--surface));min-width:0}
+.cal-d.past{visibility:hidden}
+.cal-d .dn{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden}
+.cal-d b{font-size:15px;font-variant-numeric:tabular-nums;justify-self:end}
+.cal-d.today{border-color:var(--accent)} .cal-d.today .dn{color:var(--accent);font-weight:700}
+.cal-d.sel{box-shadow:inset 0 0 0 2px var(--accent)}
+.caldetail{font-size:13px;margin:0}
+.dc-stack{height:12px;border-radius:6px;margin-top:2px}
+.stack>span{background:var(--c);min-width:0}
+.dc-legend{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+@media (max-width:760px){.dc-legend{display:none}}
+.dc-barwrap{position:relative;display:block}
+.dc-pop{display:none;position:absolute;left:-6px;right:-6px;top:calc(100% + 8px);z-index:5;flex-wrap:wrap;gap:4px 12px;padding:10px 12px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px color-mix(in srgb,var(--ink) 18%,transparent);font-size:12.5px;color:var(--ink);font-variant-numeric:tabular-nums}
+.dc-pop i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:5px}
+.deckcard.pop-open .dc-pop{display:flex}
+@media (max-width:760px){.dc-stack{height:16px;cursor:pointer}}
+.dc-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:baseline}
+.dc-next{font-size:13px;color:var(--muted)} .dc-next b{color:var(--ink)}
+.dc-today{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13.5px;color:var(--muted)}
+.dc-today b,.decksum b{color:var(--ink);font-variant-numeric:tabular-nums}
+b.hot{color:var(--bad)}
+@media (hover:hover) and (pointer:fine){.deckcard:hover{border-color:var(--muted)}}
+.lastline{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;margin-top:-8px;max-width:680px;width:100%;justify-self:center;display:flex;align-items:center;gap:6px;min-height:22px}
+.lastline .lt{min-width:0;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto}
+.lchg{flex:none;font:inherit;font-size:12px;line-height:1.3;padding:1px 8px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--muted)}
+.lchg.on{border-color:var(--ink);color:var(--ink);font-weight:700}
+.lastline b{color:var(--ink);font-weight:600}
+.lastline .ok{color:var(--ok);font-weight:700} .lastline .bad{color:var(--bad);font-weight:700}
+#v-learn:has(.card.answered){cursor:pointer}
+.card-head>.eyebrow{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-deck{display:flex;gap:5px;align-items:baseline}
+.deckname{font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--accent);background:none;border:0;padding:0;flex:none;max-width:62%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-dir{flex:none}
+.deckline{margin:0 0 -6px;white-space:nowrap;overflow:hidden}
+.ch-tag{flex:0 100 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-head>span:last-child{flex:none;white-space:nowrap}
+.nextpanel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:8px;box-shadow:0 8px 24px color-mix(in srgb,var(--ink) 16%,transparent)}
+.nextpanel .verdict{overflow-wrap:anywhere}
+.nextpanel .next{box-shadow:none}
+.card .nextpanel{box-shadow:none;margin-top:6px;padding:0;border:0;border-radius:0;background:transparent}
+.graderow{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:12.5px}
+@media (hover:none){.opt kbd,.next kbd,.dunno kbd{display:none}}
+@media (max-width:760px){
+  section#v-learn{gap:12px;padding-top:12px}
+  .card{gap:14px;padding:16px 14px}
+  .prompt{--pfs:clamp(26px,8vw,36px);margin-top:2px}
+  .opt{padding:11px 12px;font-size:16px}
+  .opts{gap:6px}
+  .feedback{gap:8px;padding-top:12px}
+  .readout{font-size:11.5px;gap:2px 12px}
+  .hint{display:none}
+  .top{position:static}
+  .brandname{display:none}
+  .top-inner{gap:6px}
+  .tab{padding:10px 7px;font-size:14px}
+  .tabs{gap:0}
+  .tab .long{display:none}
+  .tab .short{display:inline}
+  .learnbar{flex-wrap:nowrap}
+  .learnbar .num.muted{display:none}
+  .learnbar .progress{width:auto!important;flex:1 1 auto}
+  .learnbar>.row:first-child{flex:1 1 auto;flex-wrap:nowrap}
+  .grid2{grid-template-columns:minmax(0,1fr)}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dirstats{grid-template-columns:minmax(0,1fr)}
+  .card{padding:20px 16px}
+  .deckpick{margin-left:0;width:100%}
+  .deckpick select{flex:1 1 0;width:0;max-width:none}
+  .seg{display:flex;width:100%}
+  .seg button{flex:1 1 0;min-width:0;padding-inline:6px}
+  .kv{grid-template-columns:minmax(0,auto) minmax(0,1fr)}
+}
+@media (max-width:359px){.brand{display:none}.tab{padding:10px 5px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.next.auto::after{animation:none;width:100%}}
+</style>
+
+<header class="top">
+  <div class="top-inner">
+    <button class="brand" data-view="decks" aria-label="Deck-Übersicht öffnen" title="Decks">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M2 4 C 6 16, 9 20, 13 21" fill="none" stroke="var(--s-learning)" stroke-width="2.4" stroke-linecap="round"/><path d="M13 4 C 16 12, 19 17, 24 19" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round"/><path d="M13 21 L13 4" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="2 2"/></svg>
+      <span class="brandname">Vokabelkurve</span>
+    </button>
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" data-view="learn">Lernen</button>
+      <button class="tab" role="tab" data-view="overview">Überblick</button>
+      <button class="tab" role="tab" data-view="words">Wörter</button>
+      <button class="tab" role="tab" data-view="data">Daten<span class="long"> &amp; Einstellungen</span></button>
+      <button class="tab" role="tab" data-view="algo"><span class="long">So funktioniert's</span><span class="short">Info</span></button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="view" id="v-learn"></section>
+  <section class="view" id="v-decks" hidden></section>
+  <section class="view" id="v-overview" hidden></section>
+  <section class="view" id="v-words" hidden></section>
+  <section class="view" id="v-data" hidden></section>
+  <section class="view" id="v-algo" hidden></section>
+</main>
+<footer class="foot"><span class="sync" id="sync" role="status"></span></footer>
+<div id="overlay"></div>
+
+<script type="text/plain" id="sample-csv">Deutsch;Französisch;Thema
+das Brot;le pain;Essen
+der Käse;le fromage;Essen
+der Apfel;la pomme;Essen
+die Milch;le lait;Essen
+das Wasser;l'eau;Essen
+das Fleisch;la viande;Essen
+der Fisch;le poisson;Essen
+das Ei;l'œuf;Essen
+die Butter;le beurre;Essen
+der Zucker;le sucre;Essen
+das Salz;le sel;Essen
+die Erdbeere;la fraise;Essen
+die Kartoffel;la pomme de terre;Essen
+das Frühstück;le petit-déjeuner;Essen
+der Wein;le vin;Essen
+das Haus;la maison;Wohnen
+die Küche;la cuisine;Wohnen
+das Fenster;la fenêtre;Wohnen
+die Tür;la porte;Wohnen
+der Tisch;la table;Wohnen
+der Stuhl;la chaise;Wohnen
+das Bett;le lit;Wohnen
+der Schlüssel;la clé;Wohnen
+die Treppe;l'escalier;Wohnen
+das Dach;le toit;Wohnen
+der Baum;l'arbre;Natur
+die Blume;la fleur;Natur
+der Fluss;la rivière;Natur
+das Meer;la mer;Natur
+der Berg;la montagne;Natur
+der Himmel;le ciel;Natur
+die Wolke;le nuage;Natur
+der Regen;la pluie;Natur
+der Schnee;la neige;Natur
+der Wald;la forêt;Natur
+die Sonne;le soleil;Natur
+der Mond;la lune;Natur
+der Bahnhof;la gare;Unterwegs
+der Flughafen;l'aéroport;Unterwegs
+die Straße;la rue;Unterwegs
+die Brücke;le pont;Unterwegs
+die Kirche;l'église;Unterwegs
+das Krankenhaus;l'hôpital;Unterwegs
+die Bibliothek;la bibliothèque;Unterwegs
+der Koffer;la valise;Unterwegs
+die Fahrkarte;le billet;Unterwegs
+das Auto;la voiture;Unterwegs
+die Mutter;la mère;Menschen
+der Vater;le père;Menschen
+die Schwester;la sœur;Menschen
+der Bruder;le frère;Menschen
+der Freund;l'ami;Menschen
+das Kind;l'enfant;Menschen
+der Nachbar;le voisin;Menschen
+die Großmutter;la grand-mère;Menschen
+essen;manger;Verben
+trinken;boire;Verben
+schlafen;dormir;Verben
+sprechen;parler;Verben
+verstehen;comprendre;Verben
+suchen;chercher;Verben
+finden;trouver;Verben
+vergessen;oublier;Verben
+warten;attendre;Verben
+kaufen;acheter;Verben
+schreiben;écrire;Verben
+lesen;lire;Verben
+laufen;courir;Verben
+lachen;rire;Verben
+öffnen;ouvrir;Verben
+schließen;fermer;Verben
+groß;grand;Adjektive
+klein;petit;Adjektive
+schnell;rapide;Adjektive
+langsam;lent;Adjektive
+schön;beau;Adjektive
+teuer;cher;Adjektive
+billig;bon marché;Adjektive
+müde;fatigué;Adjektive
+glücklich;heureux;Adjektive
+leer;vide;Adjektive
+voll;plein;Adjektive
+warm;chaud;Adjektive
+kalt;froid;Adjektive
+schwierig;difficile;Adjektive
+einfach;facile;Adjektive</script>
+<script>
+"use strict";
+/* =====================================================================
+   FSRS-6 (Free Spaced Repetition Scheduler), Standardparameter
+   Quelle: open-spaced-repetition/awesome-fsrs Wiki "The Algorithm"
+   ===================================================================== */
+const W=[0.212,1.2931,2.3065,8.2956,6.4133,0.8334,3.0194,0.001,1.8722,0.1666,0.796,1.4835,0.0614,0.2629,1.6483,0.6014,1.8729,0.5425,0.0912,0.0658,0.1542];
+const DECAY=-W[20];
+const FACTOR=Math.pow(0.9,1/DECAY)-1;
+const DAY=864e5, MIN=6e4;
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
+const FSRS={
+  // Abrufwahrscheinlichkeit nach t Tagen bei Stabilität S
+  R:(t,S)=>Math.pow(1+FACTOR*Math.max(0,t)/S,DECAY),
+  // Tage, bis R auf die Zielbehaltensrate r fällt
+  interval:(S,r)=>S/FACTOR*(Math.pow(r,1/DECAY)-1),
+  S0:g=>Math.max(W[g-1],0.1),
+  D0:g=>clamp(W[4]-Math.exp(W[5]*(g-1))+1,1,10),
+  nextD(D,g){const dp=D+(-W[6]*(g-3))*(10-D)/9;return clamp(W[7]*FSRS.D0(4)+(1-W[7])*dp,1,10)},
+  sRecall(D,S,R,g){
+    const hard=g===2?W[15]:1, easy=g===4?W[16]:1;
+    return S*(1+Math.exp(W[8])*(11-D)*Math.pow(S,-W[9])*(Math.exp(W[10]*(1-R))-1)*hard*easy);
+  },
+  sForget(D,S,R){
+    const sf=W[11]*Math.pow(D,-W[12])*(Math.pow(S+1,W[13])-1)*Math.exp(W[14]*(1-R));
+    return Math.min(sf,S);
+  },
+  sShort(S,g){let s=S*Math.exp(W[17]*(g-3+W[18]))*Math.pow(S,-W[19]);if(g>=3)s=Math.max(s,S);return s}
+};
+// Reine Funktion: Karte + Bewertung + Zeitpunkt -> neue Karte
+function applyReview(c,g,t,ret){
+  const n=c?{...c,h:c.h.slice()}:{S:0,D:0,last:0,due:0,reps:0,lapses:0,lastG:0,h:[]};
+  let Rb=-1;
+  if(!c||!c.reps){n.S=FSRS.S0(g);n.D=FSRS.D0(g)}
+  else{
+    const el=(t-c.last)/DAY;
+    Rb=FSRS.R(el,c.S);
+    if(el<1) n.S=FSRS.sShort(c.S,g);
+    else n.S=g===1?FSRS.sForget(c.D,c.S,Rb):FSRS.sRecall(c.D,c.S,Rb,g);
+    n.D=FSRS.nextD(c.D,g);
+    if(g===1) n.lapses++;
+  }
+  n.S=clamp(n.S,0.01,36500);
+  n.reps++;n.lastG=g;n.last=t;
+  n.due=g===1?t+10*MIN:t+Math.max(1,Math.round(FSRS.interval(n.S,ret)))*DAY;
+  n.h.push([t,g,Rb<0?-1:+Rb.toFixed(3),+n.S.toFixed(3),+n.D.toFixed(2)]);
+  return n;
+}
+
+/* ===================== Zustand & Speicher ===================== */
+const LS_KEY='vokabelkurve.v1';
+const STATUS={new:{l:'Neu',r:0,d:'noch nicht geübt'},learning:{l:'Lernphase',r:1,d:'zuletzt falsch oder unter 1 Tag'},fresh:{l:'Frisch',r:2,d:'sitzt 1–3 Tage'},shaky:{l:'Wackelig',r:3,d:'sitzt 3–7 Tage'},okay:{l:'Ordentlich',r:4,d:'sitzt 1–2 Wochen'},good:{l:'Gut',r:5,d:'sitzt 2–4 Wochen'},solid:{l:'Sicher',r:6,d:'sitzt 1–3 Monate'},master:{l:'Gemeistert',r:7,d:'sitzt über 3 Monate'}};
+const ORDER=['master','solid','good','okay','shaky','fresh','learning','new'];
+const GRADES={0:'Vertippt',1:'Nochmal',2:'Schwer',3:'Gut',4:'Leicht'};
+const LEN_MS_DEFAULT=20,SLIP_MS_DEFAULT=1200,FAST_MS=2000,SLOW_MS=8000,TIME_MIN_N=150,TIME_MIN_WRONG=20,EASY_ACC=0.95,HARD_ACC=0.8;
+const secs=ms=>nf(ms/1000,1).replace(/,0$/,'')+' s';
+const gradeRule=(g,pm)=>({1:'falsche Antwort',2:`richtig, bereinigte Zeit über ${secs(pm.slow)}`,3:`richtig, bereinigte Zeit ${secs(pm.fast)}–${secs(pm.slow)}`,4:`richtig, bereinigte Zeit unter ${secs(pm.fast)}`})[g];
+// Standard-Korrektur pro Position, bis genug eigene Daten für positionsweise Anker vorliegen
+const POS_MS_DEFAULT=400,HIST_MAX=40,AUTO_MS=1200,QUICK_MS=350;
+// Was nach einer richtigen Antwort passiert: sofort weiter (Standard), nach kurzer Pause oder erst nach Tippen
+const nextMode=()=>db.settings.nextMode||(db.settings.autoNext===false?'tap':'instant');
+let autoTimer=0;
+let db=null, session=null, view='learn', toastTimer=0;
+const wordSort={k:'due',dir:1}; let wordFilter='all', wordSearch='', calSel=0;
+let sim=null, simTiming='due', pendingImport=null, delArm=null;
+
+function freshDb(){return{v:1,decks:[],active:null,cards:{},settings:{retention:0.9,newPer:10,size:20,dirMode:'both',ovMode:'word',offset:0,autoNext:true,nextMode:'instant',afterGoal:'new'}}}
+function loadLocal(){try{const s=localStorage.getItem(LS_KEY);return s?JSON.parse(s):null}catch(e){return null}}
+function saveLocal(){try{localStorage.setItem(LS_KEY,JSON.stringify(db))}catch(e){setSync('error','Browser-Speicher blockiert')}}
+
+/* ---- Server-Speicher (db-Capability des Artifacts) ----
+   app/settings            {active, settings}
+   decks/<deck>            Metadaten: name, Sprachen, B (Anzahl Karten-Buckets), chunks
+   deckwords/<deck>~<k>    bis zu 1500 Wörter als [id,a,b,tag]
+   cards/<deck>~<n>        Lernstand aller Karten, deren Wort-ID in Bucket n fällt
+   Pro Antwort wird genau ein Bucket-Dokument geschrieben. */
+let srv=null,mode='local',localOffer=null,syncState='local';
+const CARDS_PER_BUCKET=80,WORDS_PER_CHUNK=1500,pend=new Map();
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function setSync(state,msg){
+  syncState=state;const el=document.getElementById('sync');if(!el)return;
+  el.dataset.state=state;
+  el.textContent=msg||{local:'Nur in diesem Browser gespeichert',saving:'Speichert …',ok:'Auf dem Server gespeichert',error:'Speichern fehlgeschlagen'}[state];
+}
+function syncErr(e){
+  const c=e&&e.code;
+  setSync('error',c==='quota_exceeded'?'Server-Speicher voll':c==='revoked'||c==='not_granted'||c==='invalid_argument'?'Kein Schreibzugriff auf den Server':'Speichern fehlgeschlagen');
+  console.warn('db',e);
+}
+function put(path,build){
+  let p=pend.get(path);
+  if(p){p.build=build;p.again=true;return}
+  p={build,again:true};pend.set(path,p);setSync('saving');runPut(path,p);
+}
+async function runPut(path,p){
+  let ok=true;
+  while(p.again){
+    p.again=false;const body=p.build();
+    for(let a=0;a<2;a++){
+      try{const ref=srv.doc(path);if(body===null)await ref.delete();else await ref.set(body);ok=true;break}
+      catch(e){if(e&&e.code==='unavailable'&&a===0){await sleep(600+Math.random()*900);continue}ok=false;syncErr(e);break}
+    }
+  }
+  pend.delete(path);
+  if(!pend.size&&ok)setSync('ok');
+}
+const bucketOf=(wid,B)=>parseInt(wid,36)%B;
+function ensureB(d){if(!d.B)d.B=Math.max(1,Math.ceil(d.words.length*2/CARDS_PER_BUCKET));return d.B}
+function bucketBody(d,n){
+  const c={};
+  for(const w of d.words){if(bucketOf(w.id,d.B)!==n)continue;for(const dir of[0,1]){const x=db.cards[key(d.id,w.id,dir)];if(x)c[w.id+'_'+dir]=x}}
+  return{deck:d.id,n,c};
+}
+function writeDeck(d,withCards){
+  ensureB(d);if(!d.created)d.created=Date.now();
+  const k=Math.max(1,Math.ceil(d.words.length/WORDS_PER_CHUNK)),prev=d.chunks||0;
+  for(let i=0;i<Math.max(k,prev);i++)put(`deckwords/${d.id}~${i}`,()=>i<k?{deck:d.id,k:i,w:d.words.slice(i*WORDS_PER_CHUNK,(i+1)*WORDS_PER_CHUNK).map(w=>[w.id,w.a,w.b,w.tag])}:null);
+  d.chunks=k;
+  put(`decks/${d.id}`,()=>({name:d.name,langA:d.langA,langB:d.langB,sample:!!d.sample,B:d.B,chunks:d.chunks,created:d.created}));
+  if(withCards)for(let n=0;n<d.B;n++)put(`cards/${d.id}~${n}`,()=>bucketBody(d,n));
+}
+// save(): was sich geändert hat. Lokal wird immer alles geschrieben.
+function save(o={settings:1}){
+  if(mode!=='server'){saveLocal();return}
+  if(o.all){db.decks.forEach(d=>writeDeck(d,true));o.settings=1}
+  if(o.card){const d=db.decks.find(x=>x.id===o.card[0]);if(d){ensureB(d);const n=bucketOf(o.card[1],d.B);put(`cards/${d.id}~${n}`,()=>bucketBody(d,n))}}
+  if(o.deck){const d=db.decks.find(x=>x.id===o.deck);if(d)writeDeck(d,false)}
+  if(o.delDeck){const d=o.delDeck;for(let n=0;n<(d.B||0);n++)put(`cards/${d.id}~${n}`,()=>null);for(let i=0;i<(d.chunks||0);i++)put(`deckwords/${d.id}~${i}`,()=>null);put(`decks/${d.id}`,()=>null)}
+  if(o.resetDeck){const d=o.resetDeck;for(let n=0;n<(d.B||0);n++)put(`cards/${d.id}~${n}`,()=>null)}
+  if(o.settings)put('app/settings',()=>({active:db.active,settings:db.settings}));
+}
+async function loadServer(s){
+  const get=async q=>{try{return await q.get()}catch(e){if(e&&e.code==='unavailable'){await sleep(900);return q.get()}throw e}};
+  const [st,dk,dw,cd]=await Promise.all([get(s.doc('app/settings')),get(s.collection('decks').limit(1000)),get(s.collection('deckwords').limit(1000)),get(s.collection('cards').limit(1000))]);
+  if(!st.exists&&dk.empty)return null;
+  const out=freshDb(),words={};
+  dw.docs.forEach(doc=>{const x=doc.data();(words[x.deck]=words[x.deck]||[])[x.k]=x.w});
+  dk.docs.forEach(doc=>{const m=doc.data();out.decks.push({id:doc.id,name:m.name,langA:m.langA,langB:m.langB,sample:!!m.sample,B:m.B,chunks:m.chunks,created:m.created,
+    words:(words[doc.id]||[]).flat().map(([id,a,b,tag])=>({id,a,b,tag:tag||''}))})});
+  out.decks.sort((a,b)=>(a.created||0)-(b.created||0));
+  cd.docs.forEach(doc=>{const x=doc.data(),c=x.c||{};for(const k in c){const i=k.lastIndexOf('_');out.cards[key(x.deck,k.slice(0,i),k.slice(i+1))]=JSON.parse(JSON.stringify(c[k]))}});
+  if(st.exists){const x=st.data();out.settings={...out.settings,...JSON.parse(JSON.stringify(x.settings||{}))};out.active=x.active}
+  if(!out.decks.some(d=>d.id===out.active))out.active=out.decks[0]?out.decks[0].id:null;
+  return out;
+}
+function localSummary(o){const reps=Object.values(o.cards||{}).reduce((a,c)=>a+(c.reps||0),0);return`${o.decks.length} ${o.decks.length===1?'Deck':'Decks'}, ${nf(reps)} Wiederholungen`}
+function migrateLocal(){
+  if(!localOffer)return;
+  db={...freshDb(),...localOffer,settings:{...freshDb().settings,...localOffer.settings}};
+  db.decks.forEach(d=>{delete d.B;delete d.chunks});
+  localOffer=null;posCache=null;session=null;save({all:1});
+  renderDeckSel();if(deck())startSession(false);show(view);toast('Lernstand auf den Server übernommen');
+}
+function loadSampleDeck(){
+  const d=seedSample(false);save({deck:d.id,settings:1});if(mode!=='server')save();
+  renderDeckSel();startSession(false);show(view);
+}
+const now=()=>Date.now()+(db.settings.offset||0);
+const deck=()=>db.decks.find(d=>d.id===db.active)||null;
+const key=(did,wid,dir)=>did+'|'+wid+'|'+dir;
+function hid(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0).toString(36)}
+// Stufen nach Stabilität S (Tage, bis die Abrufwahrscheinlichkeit auf 90 % fällt)
+function status(c){if(!c||!c.reps)return'new';const S=c.S;if(c.lastG===1||S<1)return'learning';if(S<3)return'fresh';if(S<7)return'shaky';if(S<14)return'okay';if(S<30)return'good';if(S<90)return'solid';return'master'}
+const curR=(c,t)=>c&&c.reps?FSRS.R((t-c.last)/DAY,c.S):0;
+
+/* ===================== Formatierung ===================== */
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf=(x,d=0)=>x.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct=x=>nf(x*100)+' %';
+function fmtIvl(ms){
+  const m=ms/MIN;if(m<60)return Math.max(1,Math.round(m))+' Min';
+  const h=m/60;if(h<23.5)return Math.round(h)+' Std';
+  const d=h/24;if(d<30.5){const r=Math.round(d);return r+(r===1?' Tag':' Tage')}
+  const mo=d/30.44;if(mo<11.5)return nf(mo,mo<3?1:0)+' Mon.';
+  return nf(d/365.25,1)+' J.';
+}
+const fmtS=S=>S<1?nf(S*24,0)+' Std':nf(S,S<10?1:0)+' T';
+function fmtDue(due,t){const d=due-t;return d<=0?'fällig':'in '+fmtIvl(d)}
+const pill=s=>`<span class="pill st-${s}">${STATUS[s].l}</span>`;
+function toast(msg){clearTimeout(toastTimer);let el=document.querySelector('.toast');if(!el){el=document.createElement('div');el.className='toast';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=msg;toastTimer=setTimeout(()=>el.remove(),2600)}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* ===================== CSV ===================== */
+function detectDelim(text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim()).slice(0,10);
+  let best=',',bestScore=-1;
+  for(const d of [';',',','\t','|']){
+    const counts=lines.map(l=>{let n=0,q=false;for(const ch of l){if(ch==='"')q=!q;else if(ch===d&&!q)n++}return n});
+    const min=Math.min(...counts);
+    const score=min>0?min*10+(counts.every(c=>c===counts[0])?5:0):0;
+    if(score>bestScore){bestScore=score;best=d}
+  }
+  return best;
+}
+function parseCSV(text,delim){
+  text=text.replace(/^﻿/,'');
+  const rows=[];let row=[],f='',q=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(q){
+      if(ch==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}
+      else f+=ch;
+    }else if(ch==='"')q=true;
+    else if(ch===delim){row.push(f);f=''}
+    else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f=''}
+    else f+=ch;
+  }
+  if(f!==''||row.length){row.push(f);rows.push(row)}
+  return rows.filter(r=>r.some(c=>c.trim()!==''));
+}
+// Vergleichsform: ohne Groß-/Kleinschreibung, Satzzeichen und doppelte Leerzeichen („Bonjour !“ = „bonjour“)
+function normText(s){return String(s).toLowerCase().replace(/[\s!?.,;:…'’()\-]+/g,' ').trim()}
+function buildWords(rows,ca,cb,ct){
+  const seen=new Set(),words=[];
+  for(const r of rows){
+    const a=(r[ca]||'').trim(),b=(r[cb]||'').trim();
+    if(!a||!b)continue;
+    const id=hid(a+'\u0001'+b),nk=normText(a)+'\u0001'+normText(b);
+    if(seen.has(nk))continue;seen.add(nk); // Dubletten auch bei anderer Schreibweise überspringen
+    words.push({id,a,b,tag:ct>=0?(r[ct]||'').trim():''});
+  }
+  return words;
+}
+
+/* ===================== Beispiel-Deck mit simuliertem Verlauf ===================== */
+function seedSample(withHistory){
+  const text=document.getElementById('sample-csv').textContent.trim();
+  const rows=parseCSV(text,';');
+  const d={id:'beispiel-de-fr',name:'Beispiel: Deutsch – Französisch',langA:rows[0][0],langB:rows[0][1],words:buildWords(rows.slice(1),0,1,2),sample:true};
+  d.created=Date.now();db.decks.push(d);db.active=d.id;
+  if(withHistory)simulateHistory(d);
+  return d;
+}
+function simulateHistory(d){
+  const rnd=mulberry32(11),T=Date.now();
+  d.words.forEach((w,i)=>{
+    if(i%7===6||i>=70)return; // ein Teil bleibt neu
+    const ease=0.72+rnd()*0.3,start=T-(5+rnd()*32)*DAY;
+    [0,1].forEach(dir=>{
+      if(dir===1&&rnd()<0.3)return;
+      let t=start+dir*rnd()*4*DAY,c=null;
+      for(let k=0;k<40&&t<T;k++){
+        let g;
+        if(!c)g=rnd()<0.62?3:(rnd()<0.5?1:2);
+        else{
+          const el=(t-c.last)/DAY,p=el<1?0.85:FSRS.R(el,c.S)*ease+(1-ease)*0.2;
+          if(rnd()<p){const r2=rnd();g=r2<0.14?2:(r2<0.9?3:4)}else g=1;
+        }
+        c=applyReview(c,g,t,0.9);
+        t=c.due+(rnd()<0.3?(c.due-c.last)*rnd()*0.7:0)+rnd()*0.4*DAY;
+      }
+      if(c)db.cards[key(d.id,w.id,dir)]=c;
+    });
+  });
+}
+
+/* ===================== Lernen ohne Runden ===================== */
+// Es kommt immer die nächste sinnvollste Karte, bis man aufhört. Jede Antwort wird sofort gespeichert.
+// Die Karte, die beim Aufhören unbeantwortet auf dem Bildschirm steht, zählt nicht.
+const IDLE_MS=45000,RECENT_MAX=5,NEW_EVERY=4;
+function dirsFor(mode){return mode==='both'?[0,1]:[+mode]}
+function startOfToday(){const d=new Date(now());d.setHours(0,0,0,0);return d.getTime()}
+// Wörter, die heute zum ersten Mal drankamen (egal in welcher Richtung)
+function newWordsToday(d){
+  const sod=startOfToday();let n=0;
+  for(const w of d.words){
+    let first=Infinity,seen=false;
+    for(const dir of[0,1]){const c=db.cards[key(d.id,w.id,dir)];if(c&&c.reps){seen=true;first=Math.min(first,c.reps===c.h.length?c.h[0][0]:0)}}
+    if(seen&&first>=sod)n++;
+  }
+  return n;
+}
+function queueCounts(){
+  const d=deck();if(!d)return{due:0,fresh:0};
+  const t=now();let due=0,fresh=0;
+  for(const w of d.words)for(const dir of dirsFor(db.settings.dirMode)){const c=db.cards[key(d.id,w.id,dir)];if(!c||!c.reps)fresh++;else if(c.due<=t)due++}
+  return{due,fresh};
+}
+// Regeln: Eine richtig beantwortete Karte kommt erst wieder, wenn FSRS sie fällig macht (frühestens am nächsten Tag).
+// Am selben Tag wiederholt werden nur falsch beantwortete Karten. Die Rückrichtung eines neuen Wortes kommt erst ab dem Folgetag.
+// Rückrichtungen, die heute zum ersten Mal drankamen (Hinrichtung schon vor heute gelernt)
+function newReverseToday(d){
+  const sod=startOfToday();let n=0;
+  for(const w of d.words){const a=db.cards[key(d.id,w.id,0)],b=db.cards[key(d.id,w.id,1)];if(firstReview(b)>=sod&&firstReview(b)<Infinity&&firstReview(a)<sod)n++}
+  return n;
+}
+function firstReview(c){return c&&c.reps?(c.reps===c.h.length?c.h[0][0]:0):Infinity}
+function pickNext(ignoreRecent){
+  const d=deck(),t=now(),st=db.settings,ses=session,sod=startOfToday();
+  // 1) falsch beantwortete Karten kommen nach drei anderen noch einmal
+  const si=ses.soon.findIndex(x=>x.at<=ses.n);
+  if(si>=0){const x=ses.soon.splice(si,1)[0];return{wid:x.wid,dir:x.dir,again:x.again}}
+  const recent=ignoreRecent?new Set():new Set(ses.recent); // zuletzt gezeigte Wörter, beide Richtungen
+  const due=[],freshRev=[],freshWords=[],practice=[],anySeen=[];
+  for(const w of d.words){
+    if(recent.has(w.id))continue;
+    for(const dir of dirsFor(st.dirMode)){
+      const c=db.cards[key(d.id,w.id,dir)];
+      if(!c||!c.reps){
+        const other=db.cards[key(d.id,w.id,1-dir)];
+        if(other&&other.reps){if(st.dirMode==='both'&&firstReview(other)<sod)freshRev.push({wid:w.id,dir,isNew:true,hard:other.D-Math.log(other.S+1)})}
+        else if(dir===0||st.dirMode!=='both')freshWords.push({wid:w.id,dir,isNew:true});
+      }else if(c.due<=t)due.push({wid:w.id,dir,R:curR(c,t)});
+      else{const it={wid:w.id,dir,R:curR(c,t)};anySeen.push(it);if(c.last<t-30*MIN)practice.push(it)}
+    }
+  }
+  // Fällige Karten: niedrigste Abrufwahrscheinlichkeit zuerst; fast gleiche Werte (± 2 Prozentpunkte) werden zufällig gemischt,
+  // damit am selben Tag gelernte Wörter nicht immer in Dateireihenfolge zurückkommen
+  const minR=a=>a.reduce((m,x)=>{const k=x.R+(Math.random()-0.5)*0.04;return k<m.k?{...x,k}:m},{k:Infinity});
+  // Rückrichtungen: Wörter, die in der Hinrichtung schwerfielen (hohe Schwierigkeit, kleine Stabilität), zuerst
+  freshRev.sort((a,b)=>b.hard-a.hard+(Math.random()-0.5)*0.5);
+  // Neue Wörter: grob nach Häufigkeit, aber zufällig aus den nächsten 15 statt streng der Reihe nach
+  if(freshWords.length>1){const i=Math.floor(Math.random()*Math.min(15,freshWords.length));[freshWords[0],freshWords[i]]=[freshWords[i],freshWords[0]]}
+  // Tagesziel gilt getrennt für neue Wörter und für neue Rückrichtungen; beide werden abwechselnd eingestreut
+  const revOk=freshRev.length&&newReverseToday(d)<st.newPer,wordOk=freshWords.length&&newWordsToday(d)<st.newPer;
+  const nextFresh=revOk&&(!wordOk||ses.n%2===0)?freshRev[0]:wordOk?freshWords[0]:null;
+  if(nextFresh&&(!due.length||ses.sinceNew>=NEW_EVERY))return nextFresh;
+  if(due.length)return minR(due);
+  if(nextFresh)return nextFresh;
+  // Fälliges erledigt, Tagesziel erreicht: weitere neue Karten (über das Tagesziel hinaus)
+  // Nach dem Tagesziel: je nach Wahl zuerst wiederholen (unsicherste Wörter) oder weitere neue Wörter
+  if((ses.extraMode||st.afterGoal)==='review'&&practice.length)return{...minR(practice),extra:'practice'};
+  if(freshRev.length||freshWords.length)return{...(freshRev.length&&(!freshWords.length||ses.n%2===0)?freshRev[0]:freshWords[0]),extra:'new'};
+  // keine neuen Wörter mehr: unsichere Karten, die heute noch nicht dran waren
+  if(practice.length)return{...minR(practice),extra:'practice'};
+  // letzte Stufe: alles schon heute geübt – trotzdem weiter mit den unsichersten Wörtern, damit „Weiterlernen“ immer etwas liefert
+  if(anySeen.length)return{...minR(anySeen),extra:'practice'};
+  return ignoreRecent?null:pickNext(true);
+}
+function startSession(extraMode){
+  session={n:0,right:0,wrong:0,recent:[],soon:[],sinceNew:NEW_EVERY,stopped:false,cur:null,beforeR:expectedKnown(),extraMode:extraMode||null};
+  nextCard();
+}
+function nextCard(){
+  clearTimeout(autoTimer);
+  const d=deck(),it=d&&pickNext(false);
+  const w=it&&d.words.find(x=>x.id===it.wid);
+  if(!w){session.cur=null;renderLearn();return}
+  const k=key(d.id,w.id,it.dir),c=db.cards[k];
+  session.recent.push(w.id);if(session.recent.length>Math.min(RECENT_MAX,Math.floor(d.words.length/3)))session.recent.shift();
+  session.cur={...it,w,k,opts:makeOptions(d,w,it.dir),shown:performance.now(),answer:null,grade:null,R0:curR(c,now()),st0:status(c),seen0:!!(c&&c.reps)};
+  renderLearn();
+}
+function article(s){const m=s.toLowerCase().match(/^(l'|l’|[a-zäöüéèàß]+\s)/);return m?m[1].trim():''}
+function makeOptions(d,w,dir){
+  const ans=dir===0?w.b:w.a,prm=dir===0?w.a:w.b,norm=normText;
+  const art=article(ans),rnd=Math.random;
+  const pool=d.words.filter(x=>x.id!==w.id&&norm(dir===0?x.b:x.a)!==norm(ans)&&norm(dir===0?x.a:x.b)!==norm(prm));
+  const scored=pool.map(x=>{
+    const txt=dir===0?x.b:x.a;let s=rnd()*2.5;
+    if(w.tag&&x.tag===w.tag)s+=1.5;
+    if(art&&article(txt)===art)s+=1.5;
+    if(Math.abs(txt.length-ans.length)<=2)s+=1;
+    return{txt,s};
+  }).sort((a,b)=>b.s-a.s);
+  const out=[],used=new Set([norm(ans)]);
+  for(const o of scored){if(out.length>=4)break;if(used.has(norm(o.txt)))continue;used.add(norm(o.txt));out.push({text:o.txt,correct:false})}
+  out.push({text:ans,correct:true});
+  for(let i=out.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[out[i],out[j]]=[out[j],out[i]]}
+  return out;
+}
+// Antwort bewerten und sofort speichern
+function answer(idx){
+  const cur=session&&session.cur;if(!cur||cur.answer)return;
+  const ms=performance.now()-cur.shown,o=cur.opts[idx];if(!o)return;
+  const d=deck(),prev=db.cards[cur.k];
+  // Zeit an der typischen Antwortzeit der jeweiligen Position messen
+  const pm=posModel(),adj=pm.adjOf(ms,idx,cardLen(cur.k));
+  // Sehr schnell falsch bei einem schon bekannten Wort: vermutlich vertippt. Zählt nicht, das Wort kommt nach 3 Karten noch einmal.
+  if(!o.correct&&prev&&prev.reps&&ms<=IDLE_MS&&adj<pm.slip){
+    const t=now(),n={...prev,slips:(prev.slips||[]).concat([[t,Math.round(ms),idx]]).slice(-60)};
+    db.cards[cur.k]=n;posCache=null;save({card:[d.id,cur.w.id,cur.dir]});
+    cur.answer={idx,ms,adj,credit:ms-adj,correct:false,slip:true,rule:'sehr schnell falsch, vermutlich vertippt: zählt nicht, kommt gleich nochmal'};
+    cur.grade=0;cur.prev=prev;cur.next=n;cur.t=t;
+    session.n++;session.sinceNew=cur.isNew?0:session.sinceNew+1;
+    if((cur.again||0)<2)session.soon.push({wid:cur.w.id,dir:cur.dir,at:session.n+3,again:(cur.again||0)+1});
+    session.last={text:cur.dir===0?cur.w.a:cur.w.b,ok:false,ivl:'wenigen Karten'};
+    renderLearn();return;
+  }
+  let g,rule;
+  if(!o.correct){g=1;rule=gradeRule(1,pm)}
+  else if(ms>IDLE_MS){g=3;rule='richtig; nach langer Pause, Zeit nicht gewertet'}
+  else if(adj>pm.slow){g=2;rule=gradeRule(2,pm)}
+  else if(adj<pm.fast&&prev&&prev.reps){g=4;rule=gradeRule(4,pm)}
+  else{g=3;rule=adj<pm.fast?'richtig; beim ersten Sehen höchstens „Gut“':gradeRule(3,pm)}
+  const t=now(),n=applyReview(prev,g,t,db.settings.retention);
+  // Rohzeit und Position mitschreiben (nicht bei langer Pause), damit sich die Positionsgutschrift aus eigenen Daten schätzen lässt
+  n.h[n.h.length-1]=n.h[n.h.length-1].concat([Math.round(Math.min(ms,1e7)),idx]);
+  if(n.h.length>HIST_MAX)n.h=n.h.slice(-HIST_MAX);
+  db.cards[cur.k]=n;posCache=null;
+  save({card:[d.id,cur.w.id]});
+  cur.answer={idx,ms,adj,credit:ms-adj,correct:o.correct,rule};cur.grade=g;cur.prev=prev;cur.next=n;cur.t=t;
+  session.n++;if(o.correct)session.right++;else session.wrong++;
+  session.sinceNew=cur.isNew?0:session.sinceNew+1;
+  if(g===1&&(cur.again||0)<2)session.soon.push({wid:cur.w.id,dir:cur.dir,at:session.n+3,again:(cur.again||0)+1});
+  session.last={text:cur.dir===0?cur.w.a:cur.w.b,ok:o.correct,ivl:fmtIvl(n.due-t),ref:cur};session.lastOpen=false;
+  const nm=nextMode();
+  // richtig + „sofort“: Antwort nur kurz grün aufleuchten lassen, dann direkt die nächste Karte
+  if(o.correct&&nm==='instant'){cur.quick=true;autoTimer=setTimeout(()=>{if(session&&session.cur===cur&&view==='learn')commit()},QUICK_MS)}
+  else if(o.correct&&nm==='delay')autoTimer=setTimeout(()=>{if(session&&session.cur===cur&&view==='learn')commit()},AUTO_MS);
+  renderLearn();
+}
+// „Weiß nicht“: zählt wie falsch (Nochmal) und zeigt die Lösung. Zeit und Position werden nicht gespeichert,
+// damit bewusstes Aufgeben die Zeitstatistik (Positions-Anker, Grenzen, Vertipper) nicht verfälscht.
+function dunno(){
+  const cur=session&&session.cur;if(!cur||cur.answer)return;
+  const ms=performance.now()-cur.shown,d=deck(),prev=db.cards[cur.k],t=now();
+  const n=applyReview(prev,1,t,db.settings.retention);
+  if(n.h.length>HIST_MAX)n.h=n.h.slice(-HIST_MAX);
+  db.cards[cur.k]=n;posCache=null;save({card:[d.id,cur.w.id,cur.dir]});
+  cur.answer={idx:-1,ms,adj:ms,credit:0,correct:false,dunno:true,rule:'„weiß nicht“: zählt wie falsch, kommt nach 3 Karten noch einmal'};
+  cur.grade=1;cur.prev=prev;cur.next=n;cur.t=t;
+  session.n++;session.wrong++;session.sinceNew=cur.isNew?0:session.sinceNew+1;
+  if((cur.again||0)<2)session.soon.push({wid:cur.w.id,dir:cur.dir,at:session.n+3,again:(cur.again||0)+1});
+  session.last={text:cur.dir===0?cur.w.a:cur.w.b,ok:false,dunno:true,ivl:fmtIvl(n.due-t),ref:cur};session.lastOpen=false;
+  renderLearn();
+}
+// Bewertung der vorigen (richtig beantworteten) Karte von Hand ändern, über die Zeile „Zuletzt“.
+// Jeder Tipp dort startet die Antwortzeit der gerade gezeigten Karte neu, damit die Korrektur sie nicht verfälscht.
+const LAST_GRADES=[[1,'geraten'],[2,'schwer'],[3,'gut'],[4,'leicht']];
+function lastGrade(v){
+  const L=session&&session.last,pc=L&&L.ref,cur=session&&session.cur;
+  if(!pc||!cur||cur.answer||!pc.answer.correct)return;
+  if(v==='open')session.lastOpen=true;
+  else{
+    const g=+v;
+    if(g!==pc.grade){
+      const d=deck(),n=applyReview(pc.prev,g,pc.t,db.settings.retention);
+      // Rohzeit und Position wie bei der automatischen Bewertung, dazu Markierung „von Hand“ (bleibt bei späteren Neuberechnungen erhalten)
+      n.h[n.h.length-1]=n.h[n.h.length-1].concat([Math.round(Math.min(pc.answer.ms,1e7)),pc.answer.idx,1]);
+      if(n.h.length>HIST_MAX)n.h=n.h.slice(-HIST_MAX);
+      db.cards[pc.k]=n;posCache=null;save({card:[d.id,pc.w.id,pc.dir]});
+      if(g===1&&pc.grade!==1){session.right--;session.wrong++;if((pc.again||0)<2)session.soon.push({wid:pc.w.id,dir:pc.dir,at:session.n+3,again:(pc.again||0)+1})}
+      if(g!==1&&pc.grade===1){session.right++;session.wrong--;session.soon=session.soon.filter(x=>!(x.wid===pc.w.id&&x.dir===pc.dir))}
+      pc.grade=g;pc.next=n;L.ivl=fmtIvl(n.due-pc.t);
+    }
+    session.lastOpen=false;
+  }
+  cur.shown=performance.now();
+  renderLearn();
+}
+// Weiter zur nächsten Karte (die Antwort ist bereits gespeichert)
+function commit(){
+  clearTimeout(autoTimer);
+  const cur=session&&session.cur;if(!cur||!cur.answer)return;
+  nextCard();
+}
+function stopLearning(){
+  clearTimeout(autoTimer);
+  if(!session)return;
+  session.stopped=true;session.cur=null; // unbeantwortete Karte verwerfen
+  renderLearn();
+}
+
+/* ===================== Antwortzeit nach Position ===================== */
+let posCache=null;
+// Länge (Zeichen) von Begriff + richtiger Antwort je Karte; Lesezeit hängt davon ab
+let wordLenCache=null;
+function cardLen(k){
+  if(!wordLenCache){wordLenCache={};for(const d of db.decks)for(const w of d.words)wordLenCache[d.id+'|'+w.id]=w.a.length+w.b.length}
+  const p=k.split('|');return wordLenCache[p[0]+'|'+p[1]]??null;
+}
+const medianOf=a=>{if(!a.length)return null;const s=a.slice().sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+const quantileOf=(a,q)=>{if(!a.length)return null;const s=a.slice().sort((x,y)=>x-y);return s[Math.min(s.length-1,Math.floor(q*s.length))]};
+function posModel(){
+  if(posCache)return posCache;
+  const med=medianOf;
+  // 1) Positions-Anker: Median der Antwortzeit richtiger Antworten je Position, Korrektur = Anker − Gesamtmedian
+  const by=[[],[],[],[],[]];
+  for(const k in db.cards)for(const e of db.cards[k].h)if(e.length>=7&&e[1]>1&&e[5]<20000&&by[e[6]])by[e[6]].push(e[5]);
+  const meds=by.map(med),n=by.reduce((a,b)=>a+b.length,0);
+  let fitted=false,ref=null,offset=[0,1,2,3,4].map(i=>POS_MS_DEFAULT*i);
+  if(n>=40&&by.every(a=>a.length>=5)){
+    ref=med(by.flat());
+    offset=meds.map(m=>clamp(m-ref,-3000,3000));fitted=true;
+  }
+  // 2) Längenkorrektur: Zusatzzeit pro Zeichen, geschätzt aus richtigen Antworten (6 Längengruppen, Gerade durch die Gruppen-Mediane)
+  const pts=[];
+  for(const k in db.cards){const L=cardLen(k);if(L==null)continue;for(const e of db.cards[k].h)if(e.length>=7&&e[1]>1&&e[5]<20000&&offset[e[6]]!=null)pts.push([L,e[5]-offset[e[6]]])}
+  const lenRef=med(pts.map(p=>p[0]))||20;
+  let lenSlope=LEN_MS_DEFAULT,lenFitted=false;
+  if(pts.length>=TIME_MIN_N){
+    pts.sort((a,b)=>a[0]-b[0]);
+    const G=6,grp=[...Array(G)].map((_,g)=>pts.slice(Math.floor(g*pts.length/G),Math.floor((g+1)*pts.length/G)));
+    const xs=grp.map(g=>med(g.map(p=>p[0]))),ys=grp.map(g=>med(g.map(p=>p[1])));
+    const mx=xs.reduce((a,b)=>a+b,0)/G,my=ys.reduce((a,b)=>a+b,0)/G;
+    const sxx=xs.reduce((a,x)=>a+(x-mx)**2,0);
+    if(sxx>0){lenSlope=clamp(xs.reduce((a,x,i)=>a+(x-mx)*(ys[i]-my),0)/sxx,0,150);lenFitted=true}
+  }
+  const adjOf=(ms,pos,L)=>Math.max(0,ms-(offset[pos]||0)-lenSlope*((L??lenRef)-lenRef));
+  // 3) Grenzen für Leicht/Schwer aus der Trefferquote nach bereinigter Reaktionszeit (Vertipper zählen als Fehler)
+  const all=[];
+  for(const k in db.cards){
+    const L=cardLen(k),c=db.cards[k];
+    for(const e of c.h)if(e.length>=7&&e[5]<=IDLE_MS)all.push([adjOf(e[5],e[6],L),e[1]>1]);
+    for(const s of c.slips||[])all.push([adjOf(s[1],s[2],L),false]);
+  }
+  all.sort((a,b)=>a[0]-b[0]);
+  const wrong=all.filter(x=>!x[1]).length;
+  let fast=FAST_MS,slow=SLOW_MS,timeFitted=false;
+  if(all.length>=TIME_MIN_N&&wrong>=TIME_MIN_WRONG){
+    // Örtliche Trefferquote: gleitender Durchschnitt über die W benachbarten Antworten (nach Zeit sortiert)
+    const Wn=Math.max(30,Math.round(all.length*0.1));
+    let ok=0,lt=null,st=null;
+    for(let i=0;i<all.length;i++){
+      ok+=all[i][1];if(i>=Wn)ok-=all[i-Wn][1];
+      if(i<Wn-1)continue;
+      const acc=ok/Wn,tc=all[i-(Wn>>1)][0];
+      if(lt==null&&acc<EASY_ACC)lt=tc;          // Leicht endet, wo die Quote unter 95 % fällt
+      if(lt!=null&&st==null&&acc<HARD_ACC)st=tc;  // Schwer beginnt, wo sie unter 80 % fällt
+    }
+    fast=clamp(lt!=null?lt:all[all.length-1][0],500,6000);
+    slow=st!=null?clamp(st,fast+1000,30000):Math.max(SLOW_MS,fast+1000);
+    timeFitted=true;
+  }
+  // 4) Vertipper: falsche Antwort schneller als deine schnellsten 25 % der richtigen Antworten
+  const corr=all.filter(x=>x[1]).map(x=>x[0]);
+  const slipFitted=corr.length>=40;
+  const slip=clamp(slipFitted?quantileOf(corr,0.25):SLIP_MS_DEFAULT,300,fast);
+  // Kurve für die Info-Seite
+  const edges=[0,1000,2000,3000,4000,6000,8000,12000,20000,Infinity];
+  const curve=edges.slice(0,-1).map((a,i)=>{const b=edges[i+1],xs=all.filter(x=>x[0]>=a&&x[0]<b);return{a,b,n:xs.length,acc:xs.length?xs.filter(x=>x[1]).length/xs.length:null}});
+  return posCache={offset,fitted,meds,ref,counts:by.map(a=>a.length),n,fast,slow,timeFitted,nAll:all.length,wrong,curve,lenSlope,lenRef,lenFitted,adjOf,slip,slipFitted,medCorrect:med(corr)};
+}
+// Wort-Schwierigkeit 0–100 (je Deck): 70 % bereinigte Reaktionszeit, 30 % echte (langsame) Fehler; Vertipper zählen nicht
+function wordDifficulty(d){
+  const pm=posModel();
+  if(pm.wdiff&&pm.wdiffDeck===d.id)return pm.wdiff;
+  const rows=[];let errAll=0,totAll=0;
+  for(const w of d.words){
+    const times=[];let err=0,tot=0;
+    for(const dir of[0,1]){
+      const k=key(d.id,w.id,dir),c=db.cards[k];if(!c)continue;const L=cardLen(k);
+      for(const e of c.h){if(e.length<7||e[5]>IDLE_MS)continue;tot++;if(e[1]===1)err++;else times.push([e[0],pm.adjOf(e[5],e[6],L)])}
+    }
+    if(!tot)continue;
+    errAll+=err;totAll+=tot;
+    const last=times.sort((a,b)=>a[0]-b[0]).slice(-8).map(x=>x[1]);
+    rows.push({id:w.id,n:last.length,med:medianOf(last),err,tot});
+  }
+  const ref=pm.medCorrect||FAST_MS,p0=totAll?errAll/totAll:0.1;
+  rows.forEach(r=>{r.speed=r.n?(r.med-ref)*r.n/(r.n+2):0;r.rate=(r.err+2*p0)/(r.tot+2)});
+  const rank=(arr,f)=>{const s=arr.map(f).sort((a,b)=>a-b);return v=>{let lo=0,hi=s.length;while(lo<hi){const m=(lo+hi)>>1;if(s[m]<v)lo=m+1;else hi=m}let eq=lo;while(eq<s.length&&s[eq]===v)eq++;return s.length>1?((lo+eq-1)/2)/(s.length-1):0.5}};
+  const rs=rank(rows,r=>r.speed),re=rank(rows,r=>r.rate),out={};
+  rows.forEach(r=>{out[r.id]=Math.round(100*(0.7*rs(r.speed)+0.3*re(r.rate)))});
+  pm.wdiff=out;pm.wdiffDeck=d.id;
+  return out;
+}
+
+/* ===================== Statistik ===================== */
+function itemStats(d,mode){
+  const t=now();
+  const wd=wordDifficulty(d);
+  return d.words.map(w=>{
+    const cs=[0,1].map(dir=>db.cards[key(d.id,w.id,dir)]);
+    const use=(mode==='word'?cs:[cs[+mode]]).filter(c=>c&&c.reps);
+    if(!use.length)return{w,cs,seen:false,status:'new',R:0,S:0,D:0,diff:-1,reps:0,lapses:0,due:Infinity};
+    const sts=use.map(status);
+    return{w,cs,seen:true,
+      status:sts.reduce((a,b)=>STATUS[a].r<=STATUS[b].r?a:b),
+      R:Math.min(...use.map(c=>curR(c,t))),S:Math.min(...use.map(c=>c.S)),D:Math.max(...use.map(c=>c.D)),diff:wd[w.id]??-1,
+      dueDir:(()=>{let b=null;[0,1].forEach(dir=>{const c=cs[dir];if(c&&c.reps&&(mode==='word'||+mode===dir)&&(!b||c.due<b.due))b={due:c.due,dir}});return b?b.dir:0})(),
+      reps:use.reduce((a,c)=>a+c.reps,0),lapses:use.reduce((a,c)=>a+c.lapses,0),due:Math.min(...use.map(c=>c.due)),
+      partial:mode==='word'&&use.length<2};
+  });
+}
+function cardsOf(d,mode){const out=[];for(const w of d.words)for(const dir of (mode==='word'?[0,1]:[+mode])){const c=db.cards[key(d.id,w.id,dir)];if(c&&c.reps)out.push(c)}return out}
+function expectedKnown(){const d=deck();if(!d)return 0;return itemStats(d,db.settings.ovMode).reduce((a,x)=>a+x.R,0)}
+const dirLabel=(d,dir)=>dir===0?`${d.langA} → ${d.langB}`:`${d.langB} → ${d.langA}`;
+// Kurzname aus dem Dateinamen: ae/oe/ue werden Umlaute, Sprachnamen und reine Zahlen fallen weg.
+// Beispiel: „franzoesisch_reisesaetze_1000“ → „Reisesätze“. Bleibt nichts übrig, gilt der volle Name.
+const LANG_CODES={deutsch:'DE',französisch:'FR',englisch:'EN',spanisch:'ES',italienisch:'IT',niederländisch:'NL',portugiesisch:'PT',polnisch:'PL',schwedisch:'SV',dänisch:'DA',norwegisch:'NO',finnisch:'FI',türkisch:'TR',russisch:'RU',griechisch:'EL',japanisch:'JA',chinesisch:'ZH',koreanisch:'KO',arabisch:'AR',tschechisch:'CS',kroatisch:'HR',ungarisch:'HU',rumänisch:'RO'};
+const umlauts=s=>s.replace(/(^|[^eaqi])ue/g,'$1ü').replace(/(^|[^e])oe/g,'$1ö').replace(/ae/g,'ä');
+const langCode=l=>LANG_CODES[umlauts(String(l).toLowerCase())]||String(l).slice(0,2).toUpperCase();
+function shortName(d){
+  if(d.sample)return d.name;
+  const langs=new Set([d.langA,d.langB,...Object.keys(LANG_CODES)].map(x=>umlauts(String(x).toLowerCase())));
+  const parts=umlauts(d.name.toLowerCase()).split(/[\s_-]+/).filter(p=>p&&!langs.has(p)&&!/^\d+$/.test(p));
+  return parts.length?parts.map(p=>p.charAt(0).toUpperCase()+p.slice(1)).join(' '):d.name;
+}
+// Zeile oben in Überblick und Wörter: aktives Deck (Tipp öffnet die Deck-Übersicht), Sprachrichtung, Wortzahl
+const deckLine=d=>`<p class="eyebrow ch-deck deckline"><button class="deckname" data-view="decks" title="Deck wechseln">${esc(deckLabel(d))}</button><span class="ch-dir">· ${esc(dirShort(d,0))}</span><span class="ch-tag">· ${nf(d.words.length)} Wörter</span></p>`;
+// Flagge der Fremdsprache (die Seite, die nicht Deutsch ist) vor dem Decknamen, damit man Decks verschiedener Sprachen auseinanderhält
+const FLAGS={FR:'🇫🇷',EN:'🇬🇧',ES:'🇪🇸',IT:'🇮🇹',NL:'🇳🇱',PT:'🇵🇹',PL:'🇵🇱',SV:'🇸🇪',DA:'🇩🇰',NO:'🇳🇴',FI:'🇫🇮',TR:'🇹🇷',RU:'🇷🇺',EL:'🇬🇷',JA:'🇯🇵',ZH:'🇨🇳',KO:'🇰🇷',CS:'🇨🇿',HR:'🇭🇷',HU:'🇭🇺',RO:'🇷🇴',DE:'🇩🇪'};
+function deckFlag(d){const a=langCode(d.langA),b=langCode(d.langB),f=a==='DE'?b:b==='DE'?a:b;return FLAGS[f]||f}
+const deckLabel=d=>`${deckFlag(d)} ${shortName(d)}`;
+const dirShort=(d,dir)=>dir===0?`${langCode(d.langA)}→${langCode(d.langB)}`:`${langCode(d.langB)}→${langCode(d.langA)}`;
+
+/* ===================== SVG-Diagramme ===================== */
+function niceMax(v){if(v<=0)return 1;const p=Math.pow(10,Math.floor(Math.log10(v)));for(const m of[1,2,2.5,5,10])if(m*p>=v)return m*p;return 10*p}
+function barChart(data,{W:w=480,H:h=200,ref=null,labelEvery=1}={}){
+  const L=34,R=8,T=10,B=24,iw=w-L-R,ih=h-T-B;
+  const max=niceMax(Math.max(1,...data.map(d=>d.parts.reduce((a,p)=>a+p.v,0))));
+  const bw=iw/data.length,gap=Math.min(6,bw*0.25);
+  let s=`<svg viewBox="0 0 ${w} ${h}" role="img">`;
+  const dv=[5,4,2,1].find(k=>Number.isInteger(max/k));for(let i=0;i<=dv;i++){const v=max*i/dv,y=T+ih-ih*v/max;s+=`<line class="gridline" x1="${L}" x2="${w-R}" y1="${y}" y2="${y}"/><text x="${L-6}" y="${y+4}" text-anchor="end" font-size="10">${nf(v,v%1?1:0)}</text>`}
+  data.forEach((d,i)=>{
+    let y=T+ih;const x=L+i*bw+gap/2;
+    d.parts.forEach(p=>{const ph=ih*p.v/max;if(ph>0){y-=ph;s+=`<rect class="${p.cls}" x="${x}" y="${y}" width="${bw-gap}" height="${ph}" rx="2"><title>${esc(d.title||d.label)}: ${nf(p.v)} ${esc(p.name||'')}</title></rect>`}});
+    if(i%labelEvery===0)s+=`<text x="${x+(bw-gap)/2}" y="${h-7}" text-anchor="middle" font-size="10">${esc(d.label)}</text>`;
+  });
+  if(ref!=null){const x=L+ref*iw;s+=`<line class="target" x1="${x}" x2="${x}" y1="${T}" y2="${T+ih}"/>`}
+  s+=`<line class="axis" x1="${L}" x2="${w-R}" y1="${T+ih}" y2="${T+ih}"/></svg>`;
+  return s;
+}
+function scatter(items){
+  const w=480,h=240,L=34,R=10,T=10,B=26,iw=w-L-R,ih=h-T-B;
+  const lx=v=>Math.log10(clamp(v,0.1,1000));
+  const X=v=>L+(lx(v)+1)/4*iw,Y=d=>T+ih-(d-1)/9*ih;
+  let s=`<svg viewBox="0 0 ${w} ${h}" role="img">`;
+  for(const d of[1,4,7,10])s+=`<line class="gridline" x1="${L}" x2="${w-R}" y1="${Y(d)}" y2="${Y(d)}"/><text x="${L-6}" y="${Y(d)+4}" text-anchor="end" font-size="10">${d}</text>`;
+  for(const[v,l]of[[0.1,'2 Std'],[1,'1 T'],[7,'1 W'],[30,'1 M'],[365,'1 J']])s+=`<line class="gridline" x1="${X(v)}" x2="${X(v)}" y1="${T}" y2="${T+ih}"/><text x="${X(v)}" y="${h-8}" text-anchor="middle" font-size="10">${l}</text>`;
+  for(const it of items)s+=`<circle class="fill-${it.status}" cx="${X(it.S).toFixed(1)}" cy="${Y(it.D).toFixed(1)}" r="4" fill-opacity=".75"><title>${esc(it.label)} · S ${fmtS(it.S)} · D ${nf(it.D,1)}</title></circle>`;
+  s+=`<text x="${L+4}" y="${T+12}" font-size="10" class="lbl">Schwierigkeit D</text><text x="${w-R}" y="${T+ih-6}" font-size="10" text-anchor="end" class="lbl">Stabilität S (log) →</text></svg>`;
+  return s;
+}
+function curveSvg(series,{ret=0.9,tEnd=null,nowT=null}={}){
+  const all=series.filter(s=>s.h&&s.h.length);
+  if(!all.length)return'<p class="muted">Noch keine Wiederholungen.</p>';
+  const w=640,h=230,L=38,R=10,T=12,B=28,iw=w-L-R,ih=h-T-B;
+  const t0=Math.min(...all.map(s=>s.h[0][0]));
+  let t1=tEnd||Math.max(...all.map(s=>{const l=s.h[s.h.length-1];return l[0]+Math.max(FSRS.interval(l[3],ret)*DAY*1.6,2*DAY)}));
+  if(nowT)t1=Math.max(t1,nowT+DAY);
+  const span=(t1-t0)/DAY;
+  const X=t=>L+(t-t0)/DAY/span*iw,Y=r=>T+ih-r*ih;
+  let s=`<svg viewBox="0 0 ${w} ${h}" role="img">`;
+  for(const r of[0,0.25,0.5,0.75,1])s+=`<line class="gridline" x1="${L}" x2="${w-R}" y1="${Y(r)}" y2="${Y(r)}"/><text x="${L-6}" y="${Y(r)+4}" text-anchor="end" font-size="10">${r*100}%</text>`;
+  const step=niceMax(span/6);
+  for(let d=0;d<=span+1e-9;d+=step)s+=`<text x="${X(t0+d*DAY)}" y="${h-8}" text-anchor="middle" font-size="10">${nf(d,step<1?1:0)} T</text>`;
+  s+=`<line class="target" x1="${L}" x2="${w-R}" y1="${Y(ret)}" y2="${Y(ret)}"/><text x="${w-R-4}" y="${Y(ret)-5}" text-anchor="end" font-size="10" class="lbl">Ziel ${Math.round(ret*100)} %</text>`;
+  if(nowT&&nowT<=t1)s+=`<line class="axis" x1="${X(nowT)}" x2="${X(nowT)}" y1="${T}" y2="${T+ih}" stroke-dasharray="2 3"/><text x="${X(nowT)+4}" y="${T+10}" font-size="10" class="lbl">jetzt</text>`;
+  all.forEach(sr=>{
+    let p='';
+    sr.h.forEach((e,i)=>{
+      const a=e[0],b=i+1<sr.h.length?sr.h[i+1][0]:t1,S=e[3];
+      const n=Math.max(2,Math.ceil((b-a)/(t1-t0)*120));
+      for(let j=0;j<=n;j++){const t=a+(b-a)*j/n;p+=(p?'L':'M')+X(t).toFixed(1)+','+Y(FSRS.R((t-a)/DAY,S)).toFixed(1)}
+    });
+    s+=`<path class="curve ${sr.cls}" d="${p}"/>`;
+    sr.h.forEach(e=>{const r=e[2]<0?1:e[2];s+=`<circle class="dot g${e[1]}" style="fill:var(--c)" cx="${X(e[0]).toFixed(1)}" cy="${Y(r).toFixed(1)}" r="4.5"><title>${GRADES[e[1]]}${e[2]>=0?' · R vorher '+pct(e[2]):''} · S danach ${fmtS(e[3])}</title></circle>`});
+  });
+  return s+`<line class="axis" x1="${L}" x2="${w-R}" y1="${Y(0)}" y2="${Y(0)}"/></svg>`;
+}
+const gradeLegend=()=>`<div class="legend">${[1,2,3,4].map(g=>`<span class="pill g${g}">${GRADES[g]}</span>`).join('')}</div>`;
+
+/* ===================== Ansicht: Lernen ===================== */
+function dirSelect(id){
+  const d=deck(),m=db.settings.dirMode;
+  return `<div class="seg" id="${id}" role="group" aria-label="Abfragerichtung">${[['both','Beide Richtungen'],['0',d.langA+' → '+d.langB],['1',d.langB+' → '+d.langA]].map(([v,l])=>`<button data-dir="${v}" aria-pressed="${m===v}">${esc(l)}</button>`).join('')}</div>`;
+}
+// Motivations-Statistik oben: Antworten heute, gelernte Wörter (mindestens einmal richtig), Lerntage in Folge
+function learnStats(d){
+  const sod=startOfToday(),days=new Set(),dk=t=>{const x=new Date(t);return x.getFullYear()*10000+x.getMonth()*100+x.getDate()};
+  let today=0,learned=0;
+  for(const w of d.words){
+    let ok=false;
+    for(const dir of[0,1]){const c=db.cards[key(d.id,w.id,dir)];if(!c)continue;for(const e of c.h){if(e[0]>=sod)today++;days.add(dk(e[0]));if(e[1]>1)ok=true}}
+    if(ok)learned++;
+  }
+  let streak=0,t=now();if(!days.has(dk(t)))t-=DAY;
+  while(days.has(dk(t))){streak++;t-=DAY}
+  return{today,learned,total:d.words.length,streak};
+}
+// Abgefragter Begriff bleibt einzeilig: Schrift schrittweise verkleinern, bis er passt (mindestens 13 px).
+// Passt er selbst dann nicht, bricht er innerhalb derselben festen Höhe um – die Karte ändert ihre Höhe nie.
+function fitPrompt(){
+  const el=document.querySelector('#v-learn .prompt');if(!el)return;
+  el.classList.remove('two-line');el.style.fontSize='';el.style.height='';
+  let fs=parseFloat(getComputedStyle(el).fontSize);
+  while(el.scrollWidth>el.clientWidth+1&&fs>13){fs-=1;el.style.fontSize=fs+'px'}
+  if(el.scrollWidth>el.clientWidth+1){
+    // zweizeilig in derselben Höhe: Schrift so wählen, dass zwei Zeilen hineinpassen
+    const H=el.getBoundingClientRect().height;
+    el.style.height=H+'px';el.classList.add('two-line');el.style.fontSize=Math.floor(H/2.3)+'px';
+  }
+}
+window.addEventListener('resize',()=>{if(view==='learn')fitPrompt()});
+function renderLearn(){
+  const el=document.getElementById('v-learn'),d=deck();
+  if(!d){el.innerHTML=`<div class="center-msg"><h2>Noch kein Deck</h2>
+    ${localOffer?`<p class="muted">In diesem Browser liegt noch ein Lernstand von früher (${localSummary(localOffer)}). Du kannst ihn auf den Server übernehmen.</p><button class="btn primary" data-act="migrate">Lernstand übernehmen</button>`:''}
+    <p class="muted">Lade unter „Daten &amp; Einstellungen“ eine CSV-Datei mit zwei Spalten hoch, zum Beispiel Deutsch und Französisch, oder starte mit dem Beispieldeck.</p>
+    <div class="row" style="justify-content:center"><button class="btn${localOffer?'':' primary'}" data-goto="data">CSV hochladen</button><button class="btn" data-act="sample">Beispieldeck laden (86 Wörter)</button></div></div>`;return}
+  if(d.words.length<5){el.innerHTML=`<div class="center-msg"><h2>Zu wenige Wörter</h2><p class="muted">Für fünf Antwortmöglichkeiten braucht das Deck mindestens fünf Wörter. „${esc(deckLabel(d))}“ hat ${d.words.length}.</p></div>`;return}
+  if(!session){startSession();return}
+  if(session.stopped||!session.cur){
+    const after=expectedKnown();
+    el.innerHTML=`<div class="center-msg">
+      <p class="eyebrow">${esc(deckLabel(d))}</p>
+      <h2>${session.stopped?(session.n?`${session.n} ${session.n===1?'Wort':'Wörter'} beantwortet, ${session.right} richtig`:'Pause'):'Für heute ist alles erledigt'}</h2>
+      ${!session.stopped?'<p class="muted">Alles Fällige ist wiederholt, und es gibt keine neuen Wörter mehr. Richtig beantwortete Karten kommen erst wieder, wenn sie fällig sind.</p>':''}
+      ${session.n?`<p class="muted">Erwartet abrufbare Wörter (Σ R): <span class="num">${nf(session.beforeR,1)}</span> → <span class="num">${nf(after,1)}</span>. Das Wort, das beim Aufhören noch offen war, ist nicht gezählt.</p>`:''}
+      ${dirSelect('dirSeg')}
+      <div class="row" style="justify-content:center"><button class="btn primary" data-act="start">Weiterlernen</button><button class="btn" data-act="startReview">Unsichere Wörter wiederholen</button></div>
+      <p class="muted" style="font-size:12.5px">„Weiterlernen“ nimmt nach dem Tagesziel neue Wörter dazu. „Wiederholen“ fragt stattdessen die Wörter ab, die gerade am wenigsten sitzen, auch wenn sie noch nicht fällig sind.</p>
+    </div>`;
+    return;
+  }
+  const cur=session.cur,qc=queueCounts();
+  const st=cur.st0,R=cur.R0,prm=cur.dir===0?cur.w.a:cur.w.b,seen=cur.seen0;
+  let fb='';
+  if(cur.answer){
+    const right=cur.opts.find(o=>o.correct).text,p=cur.prev,n=cur.next,had=p&&p.reps;
+    fb=`<div class="feedback">
+      <div class="readout">
+        <span>${nf(cur.answer.ms/1000,1)} s${Math.abs(cur.answer.credit)>=50&&cur.answer.ms<=IDLE_MS?` (Pos. ${cur.answer.idx+1}: ${cur.answer.credit>0?'−':'+'}${nf(Math.abs(cur.answer.credit)/1000,1)} s → ${nf(cur.answer.adj/1000,1)} s bereinigt)`:''}</span>
+        ${had?`<span>R vorher <b>${pct(R)}</b></span>`:'<span>erste Abfrage</span>'}
+        <span>Stabilität ${had?fmtS(p.S)+' → ':''}<b>${fmtS(n.S)}</b></span>
+        <span>Schwierigkeit ${had?nf(p.D,1)+' → ':''}<b>${nf(n.D,1)}</b></span>
+        <span>Bewertung <b>${cur.answer.dunno?'weiß nicht':GRADES[cur.grade]}</b></span>
+        <span>${cur.answer.slip?'zählt nicht, <b>kommt nach 3 Karten noch einmal</b>':`nächste Abfrage <b>${fmtIvl(n.due-cur.t)}</b>`}</span>
+      </div>
+    </div>`;
+  }
+  const todo=qc.due?`noch ${qc.due} fällig`:'nichts mehr fällig';
+  el.innerHTML=`<div class="learnbar">
+      ${(()=>{const ls=learnStats(d);return`<div class="stats"><span><b>${ls.today}</b> heute</span><span>·</span><span><b>${ls.learned}</b>/${ls.total}<span class="long"> Wörter</span> gelernt</span>${ls.streak>1?`<span class="streak"><span class="dot">· </span><b>${ls.streak}</b> Tage in Folge gelernt</span>`:''}</div>`})()}
+      <div class="row"><button class="btn small" data-act="stop">Aufhören</button></div>
+    </div>
+    ${(()=>{const tp=todayPlan(d);return`<div class="todaybar"><button data-today="dueNow"><b>${tp.dueNow}</b> jetzt fällig</button><button data-today="dueToday"><b>${tp.later}</b> später heute</button><span><b>${tp.newLeft}</b> neu heute</span></div>`})()}
+    ${(()=>{const L=session.last;if(!L)return'<div class="lastline">&nbsp;</div>';
+      const pc=L.ref,can=pc&&pc.answer&&pc.answer.correct&&!cur.answer,g=pc&&pc.grade;
+      if(can&&session.lastOpen)return`<div class="lastline"><span class="lt">Vorige Karte war:</span>${LAST_GRADES.map(([v,l])=>`<button class="lchg${v===g?' on':''}" data-lg="${v}">${l}</button>`).join('')}</div>`;
+      const guess=pc&&pc.answer&&pc.answer.correct&&g===1;
+      return`<div class="lastline"><span class="lt">Zuletzt: <b>${esc(L.text)}</b> <span class="${L.ok&&!guess?'ok':'bad'}">${guess?'geraten':L.dunno?'weiß nicht':L.ok?'richtig':'falsch'}</span> · wieder in ${L.ivl.replace(/Tage$/,'Tagen')}</span>${can?`<button class="lchg" data-lg="open" aria-label="Bewertung der vorigen Karte ändern">${LAST_GRADES.find(x=>x[0]===g)[1]} · ändern</button>`:''}</div>`})()}
+    <div class="card${cur.answer?' answered':''}">
+      <div class="card-head"><span class="eyebrow ch-deck"><button class="deckname" data-view="decks" title="Deck wechseln">${esc(deckLabel(d))}</button><span class="ch-dir">· ${esc(dirShort(d,cur.dir))}</span>${cur.w.tag?`<span class="ch-tag">· ${esc(cur.w.tag)}</span>`:''}</span>
+        <span>${cur.extra?`<span class="muted" style="font-size:12.5px">${cur.extra==='new'?'über dem Tagesziel':'zusätzlich wiederholt'} · </span>`:''}${seen?pill(st)+` <span class="muted" style="font-size:12.5px;font-variant-numeric:tabular-nums">R ${pct(R)}</span>`:pill('new')}</span></div>
+      <div><div class="prompt">${esc(prm)}</div><div class="prompt-sub">Was heißt das auf ${esc(cur.dir===0?d.langB:d.langA)}?</div></div>
+      <div class="opts">${cur.opts.map((o,i)=>{let cls='';if(cur.answer){if(o.correct)cls='is-right';else if(i===cur.answer.idx)cls='is-wrong';else cls='is-dim'}return`<button class="opt ${cls}" data-opt="${i}"${cur.answer?' aria-disabled="true"':''}><kbd>${i+1}</kbd><span>${esc(o.text)}</span></button>`}).join('')}</div>
+      ${cur.answer&&!cur.quick?`<div class="nextpanel">
+      <button class="btn primary next${cur.answer.correct&&nextMode()==='delay'?' auto':''}" data-act="next" style="--auto:${AUTO_MS}ms"><span>Weiter</span><kbd>Enter</kbd></button>
+    </div>`:`<button class="dunno" data-dunno="1"${cur.answer?' aria-disabled="true"':''}><kbd>0</kbd><span>Weiß nicht</span></button>`}
+      ${cur.quick?'':fb}
+    </div>
+    <p class="hint">${cur.answer?'Tippen irgendwo, Enter oder Leertaste geht weiter.':'Tasten 1–5 wählen eine Antwort, 0 heißt „weiß nicht“. Richtige Antworten gehen sofort weiter.'}</p>`;
+  fitPrompt();
+  const nb=el.querySelector('[data-act="next"]');if(nb)nb.focus({preventScroll:true});
+}
+
+/* ===================== Ansicht: Überblick ===================== */
+function renderOverview(){
+  const el=document.getElementById('v-overview'),d=deck();
+  if(!d){el.innerHTML='<p class="muted">Noch kein Deck vorhanden.</p>';return}
+  const mode=db.settings.ovMode,t=now(),items=itemStats(d,mode),n=items.length;
+  const cnt=Object.fromEntries(ORDER.map(s=>[s,0]));items.forEach(i=>cnt[i.status]++);
+  const known=items.reduce((a,x)=>a+x.R,0);
+  const cards=cardsOf(d,mode);
+  const dueNow=cards.filter(c=>c.due<=t).length;
+  // Histogramm R
+  const rb=[{min:0.9,l:'90–100 %',d:'weißt du jetzt fast sicher',c:'--s-solid'},{min:0.7,l:'70–90 %',d:'weißt du eher',c:'--s-good'},{min:0.5,l:'50–70 %',d:'ungefähr Münzwurf',c:'--s-shaky'},{min:0,l:'unter 50 %',d:'eher schon vergessen',c:'--s-learning'}].map(b=>({...b,n:0}));
+  items.filter(x=>x.seen).forEach(x=>rb.find(b=>x.R>=b.min).n++);
+  const rbMax=Math.max(1,...rb.map(b=>b.n));
+  // Fälligkeiten
+  const sod=new Date(t);sod.setHours(0,0,0,0);
+  const wd=['So','Mo','Di','Mi','Do','Fr','Sa'];
+  const fc=Array.from({length:14},(_,i)=>{const dt=new Date(sod.getTime()+i*DAY);return{label:i===0?'heute':wd[dt.getDay()],title:dt.toLocaleDateString('de-DE'),parts:[{v:0,cls:'bar',name:'Karten'}]}});
+  cards.forEach(c=>{const i=Math.max(0,Math.floor((c.due-sod.getTime())/DAY));if(i<14)fc[i].parts[0].v++});
+  // Aktivität 30 Tage
+  const act=Array.from({length:30},(_,i)=>{const dt=new Date(sod.getTime()-(29-i)*DAY);return{label:dt.getDate()+'.',title:dt.toLocaleDateString('de-DE'),parts:[{v:0,cls:'bar-ok',name:'richtig'},{v:0,cls:'bar-bad',name:'falsch'}]}});
+  cards.forEach(c=>c.h.forEach(e=>{const i=29-Math.floor((sod.getTime()+DAY-1-e[0])/DAY);if(i>=0&&i<30)act[i].parts[e[1]===1?1:0].v++}));
+  const trouble=items.filter(x=>x.seen&&x.diff>=0).sort((a,b)=>b.diff-a.diff||a.R-b.R).slice(0,8);
+  const scat=[];for(const w of d.words)for(const dir of (mode==='word'?[0,1]:[+mode])){const c=db.cards[key(d.id,w.id,dir)];if(c&&c.reps)scat.push({S:c.S,D:c.D,status:status(c),label:dir===0?w.a:w.b})}
+  el.innerHTML=`${deckLine(d)}
+    <div class="row" style="justify-content:space-between">
+      <div class="seg" id="ovSeg" role="group" aria-label="Zählweise">${[['word','Pro Wort'],['0',d.langA+' → '+d.langB],['1',d.langB+' → '+d.langA]].map(([v,l])=>`<button data-ov="${v}" aria-pressed="${mode===v}">${esc(l)}</button>`).join('')}</div>
+      <span class="muted" style="font-size:13px">${mode==='word'?'Pro Wort zählt die schwächere der geübten Richtungen.':'Nur diese Abfragerichtung.'}</span>
+    </div>
+    ${simNotice()}
+    <div class="panel headline">
+      <p class="eyebrow">Stand jetzt · ${n} Wörter</p>
+      <p class="big">Von ${n} Wörtern kannst du gerade etwa <em>${nf(known)}</em> abrufen.</p>
+      <p class="muted">Für jedes Wort schätzt die App, wie wahrscheinlich du es gerade weißt, und zählt das zusammen. Neue Wörter zählen mit 0. Jetzt fällig: <span class="num">${dueNow}</span> Karten.</p>
+      <div class="stack" style="margin-top:12px" role="img" aria-label="Verteilung nach Status">${ORDER.map(s=>`<div class="st-${s}" style="flex-grow:${cnt[s]}" title="${STATUS[s].l}: ${cnt[s]}"></div>`).join('')}</div>
+      <p class="muted" style="font-size:12.5px;margin-top:10px">„Sitzt 2 Wochen“ heißt: Nach 2 Wochen weißt du das Wort noch mit 90 % Wahrscheinlichkeit. Abgefragt wird es, sobald die Wahrscheinlichkeit unter dein Ziel von ${Math.round(db.settings.retention*100)} % fällt${Math.round(db.settings.retention*100)===90?', also genau nach diesen 2 Wochen':`, also nach etwa ${fmtIvl(FSRS.interval(14,db.settings.retention)*DAY).replace(/\.$/,'')}`}.</p>
+      <div class="kpis" style="margin-top:6px">${ORDER.map(s=>`<div class="kpi">${pill(s)}<span class="n">${cnt[s]}</span><span class="p">${n?pct(cnt[s]/n):'–'}<br>${STATUS[s].d}</span></div>`).join('')}</div>
+    </div>
+    <div class="grid2">
+      <div class="panel chart"><h3>Wie sicher sitzen die geübten Wörter?</h3><p class="cap">Wie wahrscheinlich du die schon geübten Wörter in diesem Moment richtig weißt. Fällt ein Wort unter ${Math.round(db.settings.retention*100)} %, fragt die App es wieder ab.</p>
+        <div class="rbars">${rb.map(b=>`<div class="rbrow"><div><b>${b.l}</b><span>${b.d}</span></div><div class="rbtrack"><i style="width:${b.n/rbMax*100}%;background:var(${b.c})"></i></div><b class="rbn">${b.n}</b></div>`).join('')}</div></div>
+      <div class="panel chart"><h3>Fällige Wiederholungen</h3><p class="cap">Karten pro Tag in den nächsten 14 Tagen; „heute“ enthält überfällige.</p>${barChart(fc,{labelEvery:1})}</div>
+      <div class="panel chart"><h3>Lernaktivität, letzte 30 Tage</h3><div class="legend"><span class="pill" style="--c:var(--s-good)">richtig</span><span class="pill" style="--c:var(--s-learning)">falsch</span></div>${barChart(act,{labelEvery:5})}</div>
+      <div class="panel chart"><h3>Stabilität und Schwierigkeit je Karte</h3><p class="cap">Jeder Punkt ist eine Karte. Nach rechts: wie lange sie sitzt. Nach oben: wie schwer sie dir fällt (1–10). Oben links stehen die echten Problemfälle.</p>${scatter(scat)}</div>
+    </div>
+    <div class="panel"><h3 style="margin-bottom:8px">Sorgenkinder</h3>
+      ${trouble.length?`<div class="trouble">${trouble.map(x=>`<div data-word="${x.w.id}" style="cursor:pointer"><span>${esc(x.w.a)}</span><span class="muted">${esc(x.w.b)}</span><span class="num muted" style="font-size:12.5px">Schwierigkeit ${x.diff} · ${x.lapses}× vergessen · jetzt ${pct(x.R)}</span></div>`).join('')}</div>`:'<p class="muted">Noch keine Daten.</p>'}
+    </div>`;
+}
+
+// Simulierte Wiederholungen erkennen: echte Antworten speichern Antwortzeit und Position (7 Werte), simulierte nur 5
+function simCount(){let n=0;for(const k in db.cards)for(const e of db.cards[k].h)if(e.length<7)n++;return n}
+function simNotice(){
+  const n=simCount();if(!n)return'';
+  return`<div class="panel" style="display:grid;gap:10px;border-color:var(--s-shaky)">
+    <p><b>${nf(n)} Wiederholungen</b> in diesem Lernstand hast nicht du gemacht. Sie stammen aus dem simulierten Beispielverlauf der ersten App-Version und tauchen deshalb an Tagen auf, an denen du gar nicht geübt hast. Antworten aus den allerersten Versionen ohne Zeitmessung zählen ebenfalls dazu.</p>
+    <div><button class="btn small" data-act="cleanSim">${delArm==='sim'?'Wirklich entfernen?':'Simulierte Wiederholungen entfernen'}</button></div></div>`;
+}
+// Entfernt simulierte Wiederholungen und berechnet jede Karte aus den echten Antworten neu
+function removeSimulated(){
+  const ret=db.settings.retention;let changed=0;
+  for(const k of Object.keys(db.cards)){
+    const h=db.cards[k].h,real=h.filter(e=>e.length>=7);
+    if(real.length===h.length)continue;
+    changed++;
+    if(!real.length){delete db.cards[k]}
+    else{
+      let c=null;
+      for(const e of real){c=applyReview(c,e[1],e[0],ret);c.h[c.h.length-1]=c.h[c.h.length-1].concat(e.slice(5))}
+      if(db.cards[k].slips)c.slips=db.cards[k].slips;
+      db.cards[k]=c;
+    }
+    const[did,wid,dir]=k.split('|');save({card:[did,wid,dir]});
+  }
+  if(mode!=='server')saveLocal();
+  posCache=null;session=null;
+  return changed;
+}
+
+/* ===================== Ansicht: Wörter ===================== */
+const diffBadge=v=>`<span class="pill" style="--c:var(${v>=75?'--s-learning':v>=50?'--s-shaky':v>=25?'--s-good':'--s-solid'})">${v}</span>`;
+// Kurzform der Fälligkeit: jetzt / heute 18:30 / morgen / in 5 Tagen …
+function fmtDueShort(due,t){
+  if(due===Infinity)return'–';
+  if(due<=t)return'jetzt';
+  const sod=new Date(t);sod.setHours(0,0,0,0);
+  const days=Math.floor((due-sod.getTime())/DAY);
+  if(days===0)return'heute '+new Date(due).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  if(days===1)return'morgen';
+  if(days<7)return'in '+days+' Tagen';
+  if(days<30)return'in '+Math.round(days/7)+' Wo.';
+  if(days<365)return'in '+Math.round(days/30.4)+' Mon.';
+  return'in '+nf(days/365,1)+' J.';
+}
+const endOfToday=()=>startOfToday()+DAY;
+// Was heute ansteht (in den abgefragten Richtungen)
+function todayPlan(d){
+  const t=now(),eod=endOfToday(),sod=startOfToday(),dirs=dirsFor(db.settings.dirMode);
+  let dueNow=0,later=0,freshW=0,freshR=0;
+  for(const w of d.words)for(const dir of dirs){
+    const c=db.cards[key(d.id,w.id,dir)];
+    if(c&&c.reps){if(c.due<=t)dueNow++;else if(c.due<=eod)later++}
+    else{const o=db.cards[key(d.id,w.id,1-dir)];if(o&&o.reps){if(db.settings.dirMode==='both'&&firstReview(o)<sod)freshR++}else if(dir===0||db.settings.dirMode!=='both')freshW++}
+  }
+  const np=db.settings.newPer;
+  const newLeft=Math.min(freshW,Math.max(0,np-newWordsToday(d)))+Math.min(freshR,Math.max(0,np-newReverseToday(d)));
+  return{dueNow,later,newLeft};
+}
+// Zuletzt genutzt = Zeitpunkt der letzten Antwort in diesem Deck
+function deckLastUsed(d){let m=0;for(const w of d.words)for(const dir of[0,1]){const c=db.cards[key(d.id,w.id,dir)];if(c&&c.last>m)m=c.last}return m}
+function fmtAgo(ts){
+  if(!ts)return'noch nicht geübt';
+  const sod=startOfToday();
+  if(ts>=sod)return'heute '+new Date(ts).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  if(ts>=sod-DAY)return'gestern';
+  return'vor '+(Math.floor((sod-ts)/DAY)+1)+' Tagen';
+}
+// Nächster Fälligkeitstermin nach jetzt (in den abgefragten Richtungen) und wie viele Karten an diesem Tag fällig werden
+function nextDue(d){
+  const t=now(),dirs=dirsFor(db.settings.dirMode),dues=[];
+  for(const w of d.words)for(const dir of dirs){const c=db.cards[key(d.id,w.id,dir)];if(c&&c.reps&&c.due>t)dues.push(c.due)}
+  if(!dues.length)return null;
+  const first=Math.min(...dues),day=new Date(first);day.setHours(0,0,0,0);
+  const ds=day.getTime(),off=Math.round((ds-startOfToday())/DAY),n=dues.filter(x=>x>=ds&&x<ds+DAY).length;
+  return{first,off,n};
+}
+function fmtNextDue(x){
+  if(!x)return'';
+  const time=new Date(x.first).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  if(x.off<=0)return`Nächste fällig <b>heute um ${time}</b>`;
+  const date=new Date(x.first).toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'numeric'});
+  const k=`${x.n} ${x.n===1?'Karte':'Karten'}`;
+  return x.off===1?`Nächste fällig <b>morgen, ${date}</b> · ${k}`:`Nächste fällig <b>${date}</b> (in ${x.off} Tagen) · ${k}`;
+}
+function renderDecks(){
+  const el=document.getElementById('v-decks');
+  if(!db.decks.length){el.innerHTML='<p class="muted">Noch kein Deck vorhanden.</p>';return}
+  const list=db.decks.map(d=>{const cnt=Object.fromEntries(ORDER.map(s=>[s,0]));itemStats(d,'word').forEach(i=>cnt[i.status]++);return{d,cnt,last:deckLastUsed(d),tp:todayPlan(d),learned:learnStats(d).learned}})
+    .sort((a,b)=>b.last-a.last||shortName(a.d).localeCompare(shortName(b.d),'de'));
+  const sum=list.reduce((a,x)=>({now:a.now+x.tp.dueNow,later:a.later+x.tp.later,neu:a.neu+x.tp.newLeft}),{now:0,later:0,neu:0});
+  el.innerHTML=`
+    <div class="decksum"><p class="eyebrow">Heute über alle Decks</p>
+      <div class="todaybar"><span><b class="hot">${sum.now}</b> jetzt fällig</span><span><b>${sum.later}</b> später heute</span><span><b>${sum.neu}</b> neu</span></div></div>
+    <div class="deckcards">${list.map(x=>`<button class="deckcard${x.d.id===db.active?' active':''}" data-pick="${esc(x.d.id)}">
+      <span class="dc-name">${esc(deckLabel(x.d))}${x.d.id===db.active?'<span class="dc-tag">aktiv</span>':''}</span>
+      <span class="dc-sub">${esc(dirShort(x.d,0))} · ${nf(x.learned)} von ${nf(x.d.words.length)} gelernt · zuletzt ${fmtAgo(x.last)}</span>
+      <span class="dc-barwrap"><span class="stack dc-stack" role="img" aria-label="Verteilung nach Status">${ORDER.map(s=>`<span class="st-${s}" style="flex-grow:${x.cnt[s]}" title="${STATUS[s].l}: ${x.cnt[s]}"></span>`).join('')}</span>
+        ${ORDER.some(s=>s!=='new'&&x.cnt[s])?`<span class="dc-pop">${ORDER.filter(s=>x.cnt[s]).map(s=>`<span class="st-${s}"><i></i>${x.cnt[s]} ${STATUS[s].l}</span>`).join('')}</span>`:''}</span>
+      ${ORDER.some(s=>s!=='new'&&x.cnt[s])?`<span class="dc-legend">${ORDER.filter(s=>s!=='new'&&x.cnt[s]).map(s=>`<span class="st-${s}"><i></i>${x.cnt[s]} ${STATUS[s].l}</span>`).join('')}</span>`:''}
+      <span class="dc-today"><span><b class="${x.tp.dueNow?'hot':''}">${x.tp.dueNow}</b> jetzt fällig</span><span><b>${x.tp.later}</b> später heute</span><span><b>${x.tp.newLeft}</b> neu</span></span>
+      ${x.tp.dueNow?'':(n=>n?`<span class="dc-next">${n}</span>`:'')(fmtNextDue(nextDue(x.d)))}
+    </button>`).join('')}</div>
+    <p class="muted" style="font-size:12.5px">Sortiert nach letzter Nutzung. Tippe auf ein Deck, um damit zu lernen.</p>
+    ${dueCalendar()}`;
+}
+// Kalender: wie viele Wiederholungen an welchem Tag fällig werden, über alle Decks (abgefragte Richtungen, ohne neue Wörter).
+// „Heute“ enthält auch Überfälliges. Ein Tipp auf einen Tag zeigt, aus welchen Decks die Karten kommen.
+const CAL_WEEKS=5;
+function dueCalendar(){
+  const sod=startOfToday(),dirs=dirsFor(db.settings.dirMode),days=[];
+  const mon=new Date(sod);mon.setDate(mon.getDate()-((mon.getDay()+6)%7));   // Montag dieser Woche
+  for(let i=0;i<CAL_WEEKS*7;i++){const dt=new Date(mon);dt.setDate(mon.getDate()+i);days.push({dt,ts:dt.getTime(),n:0,by:{}})}
+  const idx=new Map(days.map((x,i)=>[x.ts,i])),last=days[days.length-1].ts;
+  for(const d of db.decks)for(const w of d.words)for(const dir of dirs){
+    const c=db.cards[key(d.id,w.id,dir)];if(!c||!c.reps)continue;
+    let ts=sod;if(c.due>=sod+DAY){const x=new Date(c.due);x.setHours(0,0,0,0);ts=x.getTime()}
+    if(ts>last)continue;
+    const day=days[idx.get(ts)];if(!day)continue;day.n++;day.by[d.id]=(day.by[d.id]||0)+1;
+  }
+  const future=days.filter(x=>x.ts>=sod),max=Math.max(1,...future.map(x=>x.n));
+  const sum=k=>future.slice(0,k).reduce((a,x)=>a+x.n,0);
+  if(!future.some(x=>x.n))return`<div class="panel"><h3>Kalender: fällige Wiederholungen</h3><p class="muted" style="font-size:13px">Noch nichts geübt, darum steht noch nichts an.</p></div>`;
+  const si=Math.min(Math.max(calSel,0),future.length-1),sel=future[si];
+  const fmtD=dt=>dt.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'numeric'});
+  const detail=sel.n?Object.entries(sel.by).sort((a,b)=>b[1]-a[1]).map(([id,n])=>{const d=db.decks.find(x=>x.id===id);return`${esc(d?deckLabel(d):id)} <b>${n}</b>`}).join(' · '):'nichts fällig';
+  return`<div class="panel calpanel"><h3>Kalender: fällige Wiederholungen</h3>
+    <p class="muted" style="font-size:13px">Alle Decks zusammen, ohne neue Wörter. „Heute“ enthält Überfälliges. Nächste 7 Tage: <b class="num">${sum(7)}</b> · nächste 4 Wochen: <b class="num">${sum(28)}</b></p>
+    <div class="cal">${['Mo','Di','Mi','Do','Fr','Sa','So'].map(x=>`<span class="cal-h">${x}</span>`).join('')}
+    ${days.map(x=>{if(x.ts<sod)return'<span class="cal-d past"></span>';const fi=future.indexOf(x),lbl=(x.dt.getDate()===1||fi===0?x.dt.getDate()+'.'+(x.dt.getMonth()+1)+'.':x.dt.getDate()+'.');
+      return`<button class="cal-d${x.ts===sod?' today':''}${fi===si?' sel':''}" data-cal="${fi}" style="--a:${x.n?Math.round(8+x.n/max*47):0}%" aria-label="${fmtD(x.dt)}: ${x.n} fällig"><span class="dn">${lbl}</span><b>${x.n||''}</b></button>`}).join('')}</div>
+    <p class="caldetail"><span class="muted">${sel.ts===sod?'Heute':fmtD(sel.dt)}:</span> ${detail}</p></div>`;
+}
+function renderWords(){
+  const el=document.getElementById('v-words'),d=deck();
+  if(!d){el.innerHTML='<p class="muted">Noch kein Deck vorhanden.</p>';return}
+  const t=now(),items=itemStats(d,'word');
+  const cnt=Object.fromEntries(ORDER.map(s=>[s,0]));items.forEach(i=>cnt[i.status]++);
+  const q=wordSearch.trim().toLowerCase();
+  const eod=endOfToday(),nNow=items.filter(x=>x.seen&&x.due<=t).length,nToday=items.filter(x=>x.seen&&x.due<=eod).length;
+  let rows=items.filter(x=>(wordFilter==='all'||x.status===wordFilter||(wordFilter==='dueNow'&&x.seen&&x.due<=t)||(wordFilter==='dueToday'&&x.seen&&x.due<=eod))&&(!q||x.w.a.toLowerCase().includes(q)||x.w.b.toLowerCase().includes(q)||x.w.tag.toLowerCase().includes(q)));
+  const k=wordSort.k,dir=wordSort.dir;
+  const val=x=>k==='a'?x.w.a.toLowerCase():k==='b'?x.w.b.toLowerCase():k==='status'?STATUS[x.status].r:k==='due'?x.due:x[k];
+  rows.sort((a,b)=>{const va=val(a),vb=val(b);return(va<vb?-1:va>vb?1:0)*dir});
+  const shown=rows.slice(0,400);
+  const th=(k2,l,num)=>`<th class="${num?'num':''}"><button data-sort="${k2}">${l}${wordSort.k===k2?(wordSort.dir>0?' ↑':' ↓'):''}</button></th>`;
+  el.innerHTML=`${deckLine(d)}
+    <div class="row" style="justify-content:space-between">
+      <div class="chips"><button class="chip" data-filter="all" aria-pressed="${wordFilter==='all'}">Alle ${items.length}</button><button class="chip" data-filter="dueNow" aria-pressed="${wordFilter==='dueNow'}">Jetzt fällig ${nNow}</button><button class="chip" data-filter="dueToday" aria-pressed="${wordFilter==='dueToday'}">Heute fällig ${nToday}</button>${ORDER.map(s=>`<button class="chip" data-filter="${s}" aria-pressed="${wordFilter===s}">${pill(s)} ${cnt[s]}</button>`).join('')}</div>
+      <input type="text" id="wordSearch" placeholder="Suchen …" value="${esc(wordSearch)}" aria-label="Wörter durchsuchen">
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr>${th('due','Fällig')}${th('a',esc(d.langA))}${th('b',esc(d.langB))}<th>Thema</th>${th('status','Status')}${th('R','R jetzt',1)}${th('S','Stabilität',1)}${th('diff','Schwierigkeit',1)}${th('reps','Wdh.',1)}${th('lapses','Vergessen',1)}</tr></thead>
+      <tbody>${shown.map(x=>`<tr data-word="${x.w.id}"><td class="duecell ${x.seen&&x.due<=t?'due-now':x.seen&&x.due<=eod?'due-today':''}">${x.seen?fmtDueShort(x.due,t):'neu'}${x.seen&&!x.partial&&x.due!==Infinity?`<small>${x.dueDir===0?esc(d.langA.slice(0,2).toUpperCase())+'→'+esc(d.langB.slice(0,2).toUpperCase()):esc(d.langB.slice(0,2).toUpperCase())+'→'+esc(d.langA.slice(0,2).toUpperCase())}</small>`:''}</td><td>${esc(x.w.a)}</td><td>${esc(x.w.b)}</td><td class="muted">${esc(x.w.tag)}</td><td>${pill(x.status)}${x.partial?' <span class="muted" style="font-size:12px">(1 Richtung)</span>':''}</td>
+        <td class="num">${x.seen?`<span class="rbar"><i style="width:${x.R*100}%"></i></span>${pct(x.R)}`:'–'}</td><td class="num">${x.seen?fmtS(x.S):'–'}</td><td class="num">${x.diff>=0?diffBadge(x.diff):'–'}</td><td class="num">${x.reps||'–'}</td><td class="num">${x.lapses||'–'}</td></tr>`).join('')}</tbody>
+    </table></div>
+    <p class="muted" style="font-size:13px">${rows.length>400?`Zeige 400 von ${rows.length} Treffern. `:''}Eine Zeile anklicken zeigt die Vergessenskurve des Wortes.</p>`;
+}
+function openWord(wid){
+  const d=deck(),w=d.words.find(x=>x.id===wid);if(!w)return;
+  const t=now(),cs=[0,1].map(dir=>db.cards[key(d.id,w.id,dir)]);
+  const box=c=>c&&c.reps?`<dl class="kv"><dt>Status</dt><dd>${pill(status(c))}</dd><dt>R jetzt</dt><dd>${pct(curR(c,t))}</dd><dt>Stabilität</dt><dd>${fmtS(c.S)}</dd><dt>FSRS-Schwierigkeit D</dt><dd>${nf(c.D,2)} (1–10)</dd><dt>Wiederholungen</dt><dd>${c.reps} (${c.lapses}× vergessen)</dd><dt>Nächste Abfrage</dt><dd>${fmtDue(c.due,t)}</dd></dl>`:'<p class="muted">Noch nicht geübt.</p>';
+  document.getElementById('overlay').innerHTML=`<div class="overlay" data-close="1"><div class="dialog" role="dialog" aria-modal="true" aria-label="Wortdetails">
+    <div class="row" style="justify-content:space-between;align-items:flex-start"><div><p class="eyebrow">${esc(w.tag||shortName(d))}</p><h2>${esc(w.a)} · ${esc(w.b)}</h2></div><button class="btn small" data-close="1">Schließen</button></div>
+    <div class="dirstats">${[0,1].map(dir=>`<div class="dirstat"><span class="pill" style="--c:${dir?'var(--s-good)':'var(--accent)'}">${esc(dirLabel(d,dir))}</span>${box(cs[dir])}</div>`).join('')}</div>
+    <div class="chart"><h3>Vergessenskurve</h3><p class="cap">Linie: modellierte Abrufwahrscheinlichkeit R über die Zeit. Punkte: Wiederholungen, eingezeichnet beim R-Wert unmittelbar davor. Nach jeder Wiederholung springt R auf 100 % und fällt danach flacher ab.</p>
+    ${curveSvg([{h:cs[0]?cs[0].h:[],cls:'c0'},{h:cs[1]?cs[1].h:[],cls:'c1'}],{ret:db.settings.retention,nowT:t})}${gradeLegend()}</div>
+  </div></div>`;
+  document.querySelector('.dialog [data-close]').focus();
+}
+
+/* ===================== Ansicht: Daten & Einstellungen ===================== */
+function renderData(){
+  const el=document.getElementById('v-data'),st=db.settings;
+  let imp='';
+  if(pendingImport){
+    const p=pendingImport,hdr=p.hasHeader?p.rows[0]:p.rows[0].map((_,i)=>'Spalte '+(i+1));
+    const body=p.hasHeader?p.rows.slice(1):p.rows;
+    const opt=(sel,none)=>(none?`<option value="-1"${sel<0?' selected':''}>keine</option>`:'')+hdr.map((h,i)=>`<option value="${i}"${i===sel?' selected':''}>${esc(h||'Spalte '+(i+1))}</option>`).join('');
+    const words=buildWords(body,p.ca,p.cb,p.ct);
+    imp=`<div class="panel" style="display:grid;gap:14px">
+      <h3>Vorschau: ${esc(p.file)}</h3>
+      <p class="muted" style="font-size:13px">Trennzeichen erkannt: <span class="mono">${p.delim==='\t'?'Tab':esc(p.delim)}</span> · ${body.length} Zeilen · ${words.length} gültige Wortpaare</p>
+      <div class="form-grid">
+        <label class="field">Deckname<input type="text" id="impName" value="${esc(p.name)}"></label>
+        <label class="field">Spalte Sprache A<select id="impA">${opt(p.ca)}</select></label>
+        <label class="field">Spalte Sprache B<select id="impB">${opt(p.cb)}</select></label>
+        <label class="field">Spalte Thema (optional)<select id="impT">${opt(p.ct,true)}</select></label>
+        <label class="field">Name Sprache A<input type="text" id="impLA" value="${esc(p.la)}"></label>
+        <label class="field">Name Sprache B<input type="text" id="impLB" value="${esc(p.lb)}"></label>
+      </div>
+      <label class="row" style="font-size:14px"><input type="checkbox" id="impHdr"${p.hasHeader?' checked':''}> Erste Zeile enthält Spaltennamen</label>
+      <div class="tablewrap"><table><thead><tr><th>${esc(p.la)}</th><th>${esc(p.lb)}</th><th>Thema</th></tr></thead><tbody>${words.slice(0,5).map(w=>`<tr><td>${esc(w.a)}</td><td>${esc(w.b)}</td><td class="muted">${esc(w.tag)}</td></tr>`).join('')}</tbody></table></div>
+      <p class="muted" style="font-size:13px">${db.decks.some(x=>x.name===p.name)?'Ein Deck mit diesem Namen existiert. Es wird aktualisiert; der Lernstand bleibt für alle unveränderten Wortpaare erhalten.':'Wörter werden über einen Hash aus beiden Spalten identifiziert. Ein erneuter Import derselben Datei behält deshalb den Lernstand.'}</p>
+      <div class="row"><button class="btn primary" data-act="import"${words.length<5?' disabled':''}>Deck übernehmen</button><button class="btn ghost" data-act="cancelImport">Abbrechen</button></div>
+    </div>`;
+  }
+  el.innerHTML=`
+    <div class="panel" style="display:grid;gap:14px">
+      <h2>CSV importieren</h2>
+      <p class="muted">Eine Zeile pro Wortpaar, mindestens zwei Spalten. Komma, Semikolon und Tab werden erkannt, eine dritte Spalte kann ein Thema enthalten. Alles läuft lokal im Browser, es wird nichts hochgeladen.</p>
+      <label class="drop" id="drop"><strong>CSV-Datei hierher ziehen oder auswählen</strong><span class="muted mono" style="font-size:12.5px">Deutsch;Französisch;Thema<br>der Apfel;la pomme;Essen</span><input type="file" id="fileIn" accept=".csv,.tsv,.txt,text/csv"></label>
+      <details><summary class="muted" style="cursor:pointer">Oder Text einfügen</summary><div style="display:grid;gap:8px;margin-top:8px"><textarea id="pasteIn" rows="6" placeholder="Deutsch;Spanisch&#10;der Hund;el perro&#10;die Katze;el gato"></textarea><div><button class="btn" data-act="paste">Eingefügten Text prüfen</button></div></div></details>
+    </div>
+    ${imp}
+    <div class="panel"><h3 style="margin-bottom:6px">Decks</h3><div class="decklist">${db.decks.map(d=>{const seen=d.words.filter(w=>[0,1].some(dir=>{const c=db.cards[key(d.id,w.id,dir)];return c&&c.reps})).length;return`<div class="deckrow"><div class="grow"><strong>${esc(deckLabel(d))}</strong>${d.id===db.active?' <span class="muted">(aktiv)</span>':''}<br><span class="muted num" style="font-size:12.5px">${d.words.length} Wörter · ${seen} geübt · ${esc(d.langA)} / ${esc(d.langB)}</span></div>
+      ${d.id!==db.active?`<button class="btn small" data-use="${d.id}">Aktivieren</button>`:''}<button class="btn small" data-reset="${d.id}">${delArm===('r'+d.id)?'Wirklich zurücksetzen?':'Lernstand zurücksetzen'}</button><button class="btn small danger" data-del="${d.id}">${delArm===('d'+d.id)?'Wirklich löschen?':'Löschen'}</button></div>`}).join('')||'<p class="muted">Keine Decks.</p>'}</div></div>
+    <div class="panel" style="display:grid;gap:14px">
+      <h3>Einstellungen</h3>
+      <div class="form-grid">
+        <label class="field">Zielbehaltensrate: <span class="num" id="retOut">${Math.round(st.retention*100)} %</span><input type="range" id="setRet" min="0.75" max="0.97" step="0.01" value="${st.retention}"></label>
+        <label class="field">Neue Wörter pro Tag<input type="number" id="setNew" min="0" max="50" value="${st.newPer}"></label>
+      </div>
+      <label class="field">Nach dem Tagesziel<select id="setAfter">${[['new','weitere neue Wörter'],['review','unsichere Wörter wiederholen']].map(([v,l])=>`<option value="${v}"${(st.afterGoal||'new')===v?' selected':''}>${l}</option>`).join('')}</select></label>
+      <label class="field">Nach richtiger Antwort<select id="setNext">${[['instant','sofort zum nächsten Wort'],['delay','nach 1,2 s weiter'],['tap','erst nach Tippen weiter']].map(([v,l])=>`<option value="${v}"${nextMode()===v?' selected':''}>${l}</option>`).join('')}</select></label>
+      <p class="muted" style="font-size:13px">Die Zielbehaltensrate bestimmt, bei welcher Abrufwahrscheinlichkeit eine Karte fällig wird. 90 % ist der übliche Wert. Höher bedeutet deutlich mehr Wiederholungen für wenig Zugewinn.</p>
+      <div class="row"><span class="field" style="margin:0">Testmodus: Zeit vorspulen</span><button class="btn small" data-shift="1">+1 Tag</button><button class="btn small" data-shift="7">+7 Tage</button><button class="btn small ghost" data-shift="0">zurück auf heute</button><span class="num muted" style="font-size:12.5px">${st.offset?'simuliertes Datum: '+new Date(now()).toLocaleDateString('de-DE'):''}</span></div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
+      <h3>Speicherort und Sicherung</h3>
+      <p style="font-size:14px">${mode==='server'?'Der Lernstand liegt auf dem Server dieses Artifacts und ist nur für dich lesbar. Er ist auf jedem Gerät verfügbar, auf dem du die Seite mit deinem Konto öffnest.':'Der Lernstand liegt nur im Speicher dieses Browsers. Auf dem Server wird gespeichert, sobald du die App als Artifact auf claude.ai öffnest.'}</p>
+      ${localOffer?`<div class="row"><span class="muted" style="font-size:13px">Lernstand aus diesem Browser gefunden: ${localSummary(localOffer)}.</span><button class="btn small" data-act="migrate">Auf den Server übernehmen</button></div>`:''}
+      <p class="muted" style="font-size:13px">Zum Sichern oder Umziehen den JSON-Text kopieren und an anderer Stelle wieder einfügen. Beim Einfügen wird er auch auf den Server geschrieben.</p>
+      <div class="row"><button class="btn" data-act="export">Sicherung anzeigen und kopieren</button><button class="btn" data-act="restore">Eingefügte Sicherung laden</button></div>
+      <textarea id="backup" rows="4" placeholder="Hier erscheint die Sicherung oder hier einfügen …"></textarea>
+    </div>`;
+  const fi=document.getElementById('fileIn'),dr=document.getElementById('drop');
+  fi.addEventListener('change',()=>fi.files[0]&&readFile(fi.files[0]));
+  dr.addEventListener('dragover',e=>{e.preventDefault();dr.classList.add('over')});
+  dr.addEventListener('dragleave',()=>dr.classList.remove('over'));
+  dr.addEventListener('drop',e=>{e.preventDefault();dr.classList.remove('over');const f=e.dataTransfer.files[0];if(f)readFile(f)});
+}
+function readFile(f){const r=new FileReader();r.onload=()=>prepImport(String(r.result),f.name.replace(/\.[^.]+$/,''));r.onerror=()=>toast('Datei konnte nicht gelesen werden.');r.readAsText(f,'utf-8')}
+function prepImport(text,name){
+  text=text.replace(/^﻿/,'');
+  const delim=detectDelim(text),rows=parseCSV(text,delim);
+  if(!rows.length||rows[0].length<2){toast('Keine zwei Spalten gefunden. Bitte Komma, Semikolon oder Tab als Trennzeichen verwenden.');return}
+  const hdr=rows[0];
+  pendingImport={file:name,name,delim,rows,hasHeader:true,ca:0,cb:1,ct:hdr.length>2?2:-1,la:hdr[0]||'Sprache A',lb:hdr[1]||'Sprache B'};
+  renderData();document.getElementById('impName').scrollIntoView({block:'center',behavior:'smooth'});
+}
+function doImport(){
+  const p=pendingImport,body=p.hasHeader?p.rows.slice(1):p.rows;
+  const words=buildWords(body,p.ca,p.cb,p.ct);
+  let d=db.decks.find(x=>x.name===p.name);
+  if(d){Object.assign(d,{langA:p.la,langB:p.lb,words});toast(`„${d.name}“ aktualisiert: ${words.length} Wörter`)}
+  else{d={id:'d'+Date.now().toString(36),name:p.name,langA:p.la,langB:p.lb,words};db.decks.push(d);toast(`„${d.name}“ angelegt: ${words.length} Wörter`)}
+  db.active=d.id;pendingImport=null;session=null;save({deck:d.id,settings:1});renderDeckSel();renderData();
+}
+
+/* ===================== Ansicht: Algorithmus ===================== */
+const M=v=>String(v).replace('.',',');
+function renderAlgo(){
+  const el=document.getElementById('v-algo');
+  if(!sim)sim={c:null,t:0};
+  const ret=db.settings.retention,c=sim.c,h=c?c.h:[];
+  el.innerHTML=`
+    <div class="prose">
+      <p class="eyebrow">FSRS-6 · Free Spaced Repetition Scheduler</p>
+      <h2>Drei Zahlen pro Karte</h2>
+      <p>Jede Karte (Wort × Richtung) trägt einen Zustand aus drei Größen. Daraus berechnet das Modell, wann die nächste Abfrage sinnvoll ist.</p>
+      <dl class="kv" style="font-size:14px;gap:6px 16px">
+        <dt><b>R</b> Abrufwahrscheinlichkeit</dt><dd style="font-family:var(--f-body)">Wahrscheinlichkeit, das Wort jetzt richtig zu wissen. Sinkt mit der Zeit.</dd>
+        <dt><b>S</b> Stabilität</dt><dd style="font-family:var(--f-body)">Tage, bis R auf 90 % gefallen ist. Das ist ein fester Bezugswert des Modells, unabhängig von deinem Ziel. Wächst mit jeder erfolgreichen Wiederholung.</dd>
+        <dt><b>D</b> Schwierigkeit</dt><dd style="font-family:var(--f-body)">1 bis 10. Bremst das Wachstum von S bei Wörtern, die dir schwerfallen.</dd>
+      </dl>
+      <div class="mathcards">
+        <div class="mathcard">
+          <h4>Vergessenskurve: Wie wahrscheinlich weiß ich das Wort noch?</h4>
+          <div class="mathbox"><math display="block"><mi>R</mi><mo stretchy="false">(</mo><mi>t</mi><mo>,</mo><mi>S</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mi>f</mi><mo>·</mo><mfrac><mi>t</mi><mi>S</mi></mfrac><mo>)</mo></mrow><mrow><mo>−</mo><mn>${M(W[20])}</mn></mrow></msup></math></div>
+          <div class="mathbox"><math display="block"><mi>f</mi><mo>=</mo><msup><mn>0,9</mn><mrow><mo>−</mo><mn>1</mn><mo>/</mo><mn>${M(W[20])}</mn></mrow></msup><mo>−</mo><mn>1</mn><mo>≈</mo><mn>${nf(FACTOR,3)}</mn></math></div>
+          <p><i>t</i> = Tage seit der letzten Wiederholung, <i>S</i> = Stabilität in Tagen. <i>f</i> ist so gewählt, dass nach genau <i>S</i> Tagen noch 90 % übrig sind.</p>
+        </div>
+        <div class="mathcard">
+          <h4>Nächste Abfrage: nach wie vielen Tagen?</h4>
+          <div class="mathbox"><math display="block"><mi>I</mi><mo>=</mo><mfrac><mi>S</mi><mi>f</mi></mfrac><mo>·</mo><mrow><mo>(</mo><msup><mi>r</mi><mrow><mo>−</mo><mn>1</mn><mo>/</mo><mn>${M(W[20])}</mn></mrow></msup><mo>−</mo><mn>1</mn><mo>)</mo></mrow></math></div>
+          <p><i>r</i> = deine Zielbehaltensrate, aktuell <b>${Math.round(ret*100)} %</b>. ${Math.round(ret*100)===90?'Damit ist das Intervall genau die Stabilität: <i>I</i> = <i>S</i>.':`Damit ist <i>I</i> ≈ ${nf(FSRS.interval(1,ret),2)} · <i>S</i>. Ein Wort, das 10 Tage sitzt, kommt also nach ${fmtIvl(FSRS.interval(10,ret)*DAY)} wieder (bei 90 % wären es 10 Tage).`}</p>
+        </div>
+        <div class="mathcard">
+          <h4>Richtig beantwortet: Stabilität wächst</h4>
+          <div class="mathbox"><math display="block"><msup><mi>S</mi><mo>′</mo></msup><mo>=</mo><mi>S</mi><mo>·</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><mi>Δ</mi><mo stretchy="false">)</mo></math></div>
+          <div class="mathbox"><math display="block"><mi>Δ</mi><mo>=</mo><msup><mi>e</mi><mn>${M(W[8])}</mn></msup><mo>·</mo><mo stretchy="false">(</mo><mn>11</mn><mo>−</mo><mi>D</mi><mo stretchy="false">)</mo><mo>·</mo><msup><mi>S</mi><mrow><mo>−</mo><mn>${M(W[9])}</mn></mrow></msup><mo>·</mo><mi>g</mi><mo>·</mo><mi>b</mi></math></div>
+          <div class="mathbox"><math display="block"><mi>g</mi><mo>=</mo><msup><mi>e</mi><mrow><mn>${M(W[10])}</mn><mo>·</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>R</mi><mo stretchy="false">)</mo></mrow></msup><mo>−</mo><mn>1</mn></math></div>
+          <p><i>D</i> = Schwierigkeit (1–10), <i>R</i> = Abrufwahrscheinlichkeit kurz vor der Antwort, <i>b</i> = ${M(W[15])} bei „Schwer“, ${M(W[16])} bei „Leicht“, sonst 1. <i>g</i> wird umso größer, je niedriger <i>R</i> war. Der Zuwachs ist also groß, wenn du das Wort fast vergessen hattest, <i>S</i> noch klein ist und das Wort leicht ist.</p>
+        </div>
+        <div class="mathcard">
+          <h4>Falsch beantwortet: Stabilität fällt</h4>
+          <div class="mathbox"><math display="block"><msup><mi>S</mi><mo>′</mo></msup><mo>=</mo><mn>${M(W[11])}</mn><mo>·</mo><msup><mi>D</mi><mrow><mo>−</mo><mn>${M(W[12])}</mn></mrow></msup><mo>·</mo><mi>h</mi><mo>·</mo><msup><mi>e</mi><mrow><mn>${M(W[14])}</mn><mo>·</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>R</mi><mo stretchy="false">)</mo></mrow></msup></math></div>
+          <div class="mathbox"><math display="block"><mi>h</mi><mo>=</mo><msup><mrow><mo stretchy="false">(</mo><mi>S</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><mn>${M(W[13])}</mn></msup><mo>−</mo><mn>1</mn></math></div>
+          <p><i>h</i> wächst mit der bisherigen Stabilität <i>S</i>. Nach einem Fehler beginnt das Wort also nicht bei null: Wer es vorher lange wusste (großes <i>S</i>), behält einen Teil der Stabilität.</p>
+        </div>
+      </div>
+      <p>Für Datenleute lesbar: Der Stabilitätsgewinn ist umso größer, je <b>niedriger R</b> zum Zeitpunkt der Wiederholung war (schwer erkämpftes Erinnern zählt mehr), je <b>kleiner S</b> schon ist (abnehmender Grenznutzen) und je <b>leichter</b> das Wort ist. Die 21 Gewichte stammen aus Fits auf Hunderten Millionen Anki-Wiederholungen und lassen sich später auf die eigenen Daten nachoptimieren.</p>
+      <p><b>Bewertung im Multiple-Choice-Test:</b> Die App fragt nicht nach, sondern leitet die Bewertung aus der Reaktionszeit ab. Bereinigt wird um die Position der Antwort (deine typische Zeit je Position) und um die Länge von Begriff und Antwort (aktuell ${nf(posModel().lenSlope)} ms pro Zeichen${posModel().lenFitted?', aus deinen Daten':', Standardwert'}). Mit der bereinigten Zeit gilt: falsch ergibt „Nochmal“, richtig über ${secs(posModel().slow)} „Schwer“, ${secs(posModel().fast)}–${secs(posModel().slow)} „Gut“, unter ${secs(posModel().fast)} „Leicht“. Woher diese Grenzen kommen, steht unten bei „Trefferquote nach Reaktionszeit“. Beim allerersten Sehen eines Wortes gibt es höchstens „Gut“, weil ein schneller Treffer dort auch Glück sein kann. Passt die Bewertung nicht zu deinem Gefühl, tippe oben in der Zeile „Zuletzt“ auf „ändern“ und wähle geraten, schwer, gut oder leicht. Die Antwortzeit der gerade gezeigten Karte beginnt danach neu. „Weiß nicht“ unter den Antworten zählt wie eine falsche Antwort, damit geratene Treffer nicht als gewusst gelten. Die Zeit dieser Antworten fließt nicht in die Statistik ein.</p>
+      <p><b>Vertipper:</b> Ist eine falsche Antwort bei einem schon bekannten Wort schneller als ${secs(posModel().slip)} (deine schnellsten 25 % der richtigen Antworten${posModel().slipFitted?'':', bis genug Daten da sind: Standardwert'}), gilt sie als vertippt. Sie zählt nicht, das Wort kommt nach drei Karten noch einmal, und diese Antwort entscheidet. Langsame Fehler zählen voll.</p>
+      <p><b>Schwierigkeit 0–100</b> (Wörter-Tabelle, Sorgenkinder): zu 70 % aus deiner bereinigten Reaktionszeit für das Wort (Median der letzten 8 richtigen Antworten, verglichen mit deinen anderen Wörtern), zu 30 % aus echten Fehlern. Bei wenigen Antworten wird zur Mitte hin gedämpft. 0 heißt: leichter als alle deine anderen Wörter, 100: schwerer.</p>
+    </div>
+    ${posPanel()}
+    <div class="panel chart">
+      <div class="row" style="justify-content:space-between"><h3>Simulator: eine Karte durchspielen</h3><button class="btn small ghost" data-sim="reset">Neu starten</button></div>
+      <p class="cap">Bewerte die Karte mehrmals hintereinander. Jede Wiederholung findet zum gewählten Zeitpunkt statt. Probiere „zu spät“ aus: R ist dann niedriger und der Stabilitätssprung größer.</p>
+      <div class="row">
+        <div class="seg" role="group" aria-label="Zeitpunkt">${[['early','zu früh (½ Intervall)'],['due','planmäßig'],['late','zu spät (3× Intervall)']].map(([v,l])=>`<button data-simt="${v}" aria-pressed="${simTiming===v}">${l}</button>`).join('')}</div>
+        <div class="row" style="gap:6px">${[1,2,3,4].map(g=>`<button class="btn small" data-sim="${g}"><span class="pill g${g}">${GRADES[g]}</span></button>`).join('')}</div>
+      </div>
+      ${h.length?curveSvg([{h,cls:'c0'}],{ret}):'<p class="muted">Klicke eine Bewertung, um die erste Abfrage zu simulieren.</p>'}
+      ${h.length?gradeLegend():''}
+      ${h.length?`<div class="tablewrap"><table><thead><tr><th class="num">#</th><th class="num">Tag</th><th>Bewertung</th><th class="num">R vorher</th><th class="num">S danach</th><th class="num">D danach</th><th class="num">nächstes Intervall</th></tr></thead><tbody>${h.map((e,i)=>`<tr><td class="num">${i+1}</td><td class="num">${nf((e[0]-h[0][0])/DAY,1)}</td><td><span class="pill g${e[1]}">${GRADES[e[1]]}</span></td><td class="num">${e[2]<0?'–':pct(e[2])}</td><td class="num">${fmtS(e[3])}</td><td class="num">${nf(e[4],2)}</td><td class="num">${e[1]===1?'10 Min':fmtIvl(Math.max(1,Math.round(FSRS.interval(e[3],ret)))*DAY)}</td></tr>`).join('')}</tbody></table></div>`:''}
+    </div>
+    <div class="panel"><h3 style="margin-bottom:10px">Warum FSRS und nicht Leitner oder SM-2?</h3>
+      <div class="tablewrap" style="border:0"><table class="cmp"><thead><tr><th>Verfahren</th><th>Modell</th><th>Stärke</th><th>Schwäche</th></tr></thead><tbody>
+        <tr><td><b>Leitner-Kasten</b></td><td>5 Fächer mit festen Intervallen</td><td>sofort verständlich, Fächer lassen sich gut zeigen</td><td>kein Wahrscheinlichkeitsmodell; jedes Wort im gleichen Fach wird gleich behandelt</td></tr>
+        <tr><td><b>SM-2</b> (Anki bis 2023)</td><td>Intervall × Ease-Faktor</td><td>einfach, seit 1987 erprobt</td><td>Heuristik ohne Vorhersage; „Ease Hell“ bei häufigen Fehlern</td></tr>
+        <tr><td><b>HLR</b> (Duolingo)</td><td>Halbwertszeit per Regression</td><td>sauberes statistisches Modell</td><td>braucht Feature-Engineering und viele Daten</td></tr>
+        <tr><td><b>FSRS-6</b> (Anki-Standard)</td><td>Vergessenskurve mit S, D, R</td><td>liefert R als echte Wahrscheinlichkeit; in Benchmarks am treffsichersten; spart 20–30 % Wiederholungen bei gleicher Behaltensrate</td><td>21 Parameter; die Formeln brauchen eine Erklärung, wie diese hier</td></tr>
+      </tbody></table></div>
+    </div>`;
+}
+function posPanel(){
+  const pm=posModel();
+  const data=pm.meds.map((m,i)=>({label:'Pos. '+(i+1),title:`Position ${i+1} (${pm.counts[i]} richtige Antworten)`,parts:[{v:m||0,cls:'bar',name:'ms Median'}]}));
+  return`<div class="panel chart"><h3>Antwortzeit nach Position</h3>
+    <p class="cap">Median der Antwortzeit (ms) deiner richtigen Antworten je Listenposition. ${pm.fitted?`Jede Position wird an ihrem eigenen Median gemessen: Die Differenz zum Gesamtmedian (${nf(pm.ref)} ms) wird abgezogen bzw. dazugerechnet. Aktuell: ${pm.offset.map((o,i)=>`Pos. ${i+1} ${Math.abs(o)<50?'±0':(o>0?'−':'+')+nf(Math.abs(o)/1000,1)+' s'}`).join(' · ')}. Grundlage: ${nf(pm.n)} richtige Antworten.`:`Bis je Position mindestens 5 und insgesamt 40 richtige Antworten vorliegen (bisher ${nf(pm.n)}), gilt ein Standard: 0,4 s Abzug pro Position weiter unten.`}</p>
+    ${pm.n?barChart(data):'<p class="muted">Noch keine gemessenen Antworten.</p>'}</div>
+  <div class="panel chart"><h3>Trefferquote nach Reaktionszeit</h3>
+    <p class="cap">Wie oft du richtig liegst, je nachdem wie schnell du antwortest (Zeit bereinigt um die Position). Daraus kommen die Grenzen: <b>Leicht</b> reicht bis zu dem Tempo, ab dem deine Trefferquote unter ${Math.round(EASY_ACC*100)} % fällt. <b>Schwer</b> beginnt, wo sie unter ${Math.round(HARD_ACC*100)} % fällt. Gemessen wird die Quote jeweils über die benachbarten Antworten mit ähnlicher Zeit (gleitender Durchschnitt).</p>
+    <p style="font-size:14px">${pm.timeFitted?`Aus deinen ${nf(pm.nAll)} Antworten (${nf(pm.wrong)} falsch): <b>Leicht unter ${secs(pm.fast)}</b>, <b>Schwer über ${secs(pm.slow)}</b>.`:`Noch Standardwerte (Leicht unter ${secs(FAST_MS)}, Schwer über ${secs(SLOW_MS)}). Eigene Grenzen ab ${TIME_MIN_N} Antworten, davon ${TIME_MIN_WRONG} falsche (bisher ${nf(pm.nAll)}, davon ${nf(pm.wrong)} falsch).`}</p>
+    ${pm.nAll?`<div class="rbars">${pm.curve.filter(b=>b.n).map(b=>`<div class="rbrow"><div><b>${b.b===Infinity?'über '+secs(b.a):secs(b.a).replace(' s','')+'–'+secs(b.b)}</b><span>${nf(b.n)} Antworten</span></div><div class="rbtrack"><i style="width:${b.acc*100}%;background:var(${b.acc>=EASY_ACC?'--s-solid':b.acc>=HARD_ACC?'--s-shaky':'--s-learning'})"></i></div><b class="rbn">${pct(b.acc)}</b></div>`).join('')}</div>`:''}
+  </div>`;
+}
+function simStep(g){
+  const ret=db.settings.retention;let t=0;
+  if(sim.c){const ivl=sim.c.lastG===1?10*MIN:Math.max(1,Math.round(FSRS.interval(sim.c.S,ret)))*DAY;t=sim.c.last+ivl*(simTiming==='early'?0.5:simTiming==='late'?3:1)}
+  sim.c=applyReview(sim.c,g,t,ret);renderAlgo();
+}
+
+/* ===================== Navigation & Ereignisse ===================== */
+function renderDeckSel(){
+  wordLenCache=null;posCache=null;
+  const s=document.getElementById('deckSel');if(!s)return;   // Deckwahl läuft über das Logo oben links
+  s.innerHTML=db.decks.map(d=>`<option value="${d.id}"${d.id===db.active?' selected':''}>${esc(deckLabel(d))} (${d.words.length})</option>`).join('')||'<option>kein Deck</option>';
+}
+function show(v){
+  if(v!=='learn')clearTimeout(autoTimer);
+  // eine noch offene Karte startet ihre Zeitmessung neu, wenn man zurückkommt
+  if(v==='learn'&&session&&session.cur&&!session.cur.answer)session.cur.shown=performance.now();
+  view=v;
+  document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===v));
+  document.querySelectorAll('section.view').forEach(s=>s.hidden=s.id!=='v-'+v);
+  ({learn:renderLearn,decks:renderDecks,overview:renderOverview,words:renderWords,data:renderData,algo:renderAlgo})[v]();
+  try{localStorage.setItem(LS_KEY+'.view',v)}catch(e){}
+}
+document.addEventListener('click',e=>{
+  // Deck-Übersicht auf dem Handy: Tipp auf den Statusbalken zeigt die Anzahlen, der nächste Tipp schließt sie wieder
+  const openPop=document.querySelector('.deckcard.pop-open'),bar=e.target.closest('.dc-stack');
+  if(bar&&matchMedia('(max-width:760px)').matches&&bar.closest('.deckcard').querySelector('.dc-pop')){
+    const card=bar.closest('.deckcard'),was=card.classList.contains('pop-open');
+    if(openPop)openPop.classList.remove('pop-open');if(!was)card.classList.add('pop-open');return;
+  }
+  if(openPop){openPop.classList.remove('pop-open');return}
+  if(view==='learn'&&session&&session.cur&&session.cur.answer&&e.target.closest('#v-learn')&&!e.target.closest('[data-act="stop"],[data-view]'))return commit();
+  const b=e.target.closest('button,[data-word],[data-close]');if(!b)return;
+  const ds=b.dataset;
+  if(ds.close&&(e.target===b||b.tagName==='BUTTON')){document.getElementById('overlay').innerHTML='';return}
+  if(ds.view)return show(ds.view);
+  if(ds.goto)return show(ds.goto);
+  if(ds.opt!=null)return answer(+ds.opt);
+  if(ds.dunno)return dunno();
+  if(ds.lg)return lastGrade(ds.lg);
+  if(ds.dir){db.settings.dirMode=ds.dir;save();session=null;return renderLearn()}
+  if(ds.cal!=null){calSel=+ds.cal;return renderDecks()}
+  if(ds.ov){db.settings.ovMode=ds.ov;save();return renderOverview()}
+  if(ds.pick){db.active=ds.pick;session=null;save();renderDeckSel();return show('learn')}
+  if(ds.filter){wordFilter=ds.filter;return renderWords()}
+  if(ds.today){wordFilter=ds.today;wordSort.k='due';wordSort.dir=1;return show('words')}
+  if(ds.sort){if(wordSort.k===ds.sort)wordSort.dir*=-1;else{wordSort.k=ds.sort;wordSort.dir=1}return renderWords()}
+  if(ds.word&&!b.closest('.dialog'))return openWord(ds.word);
+  if(ds.use){db.active=ds.use;session=null;save();renderDeckSel();return renderData()}
+  if(ds.del||ds.reset){
+    const id=ds.del||ds.reset,tag=(ds.del?'d':'r')+id;
+    if(delArm!==tag){delArm=tag;renderData();setTimeout(()=>{if(delArm===tag){delArm=null;if(view==='data')renderData()}},4000);return}
+    delArm=null;
+    const dd=db.decks.find(d=>d.id===id);
+    for(const k of Object.keys(db.cards))if(k.startsWith(id+'|'))delete db.cards[k];
+    posCache=null;
+    if(ds.del){db.decks=db.decks.filter(d=>d.id!==id);if(db.active===id)db.active=db.decks[0]?db.decks[0].id:null;save({delDeck:dd,settings:1});toast('Deck gelöscht')}
+    else{save({resetDeck:dd});toast('Lernstand zurückgesetzt')}
+    session=null;renderDeckSel();return renderData();
+  }
+  if(ds.shift!=null){const n=+ds.shift;db.settings.offset=n?(db.settings.offset||0)+n*DAY:0;session=null;save();toast(n?`Zeit um ${n} ${n===1?'Tag':'Tage'} vorgespult`:'Zurück auf heute');return renderData()}
+  if(ds.simt){simTiming=ds.simt;return renderAlgo()}
+  if(ds.sim){if(ds.sim==='reset')sim={c:null,t:0};else return simStep(+ds.sim);return renderAlgo()}
+  switch(ds.act){
+    case'start':return startSession(false);
+    case'startReview':return startSession('review');
+    case'next':return commit();
+    case'stop':return stopLearning();
+    case'import':return doImport();
+    case'migrate':return migrateLocal();
+    case'sample':return loadSampleDeck();
+    case'cancelImport':pendingImport=null;return renderData();
+    case'paste':{const v=document.getElementById('pasteIn').value;if(v.trim())prepImport(v,'Eingefügtes Deck');else toast('Das Textfeld ist leer.');return}
+    case'cleanSim':{
+      if(delArm!=='sim'){delArm='sim';renderOverview();setTimeout(()=>{if(delArm==='sim'){delArm=null;if(view==='overview')renderOverview()}},4000);return}
+      delArm=null;const n=removeSimulated();toast(`${n} Karten bereinigt`);return renderOverview();
+    }
+    case'export':{const ta=document.getElementById('backup');ta.value=JSON.stringify(db);ta.select();
+      if(navigator.clipboard)navigator.clipboard.writeText(ta.value).then(()=>toast('Sicherung kopiert'),()=>toast('Text ist markiert: mit Cmd/Strg+C kopieren'));else toast('Text ist markiert: mit Cmd/Strg+C kopieren');return}
+    case'restore':{try{const o=JSON.parse(document.getElementById('backup').value);if(!o||!Array.isArray(o.decks)||!o.cards)throw 0;db={...freshDb(),...o,settings:{...freshDb().settings,...o.settings}};posCache=null;session=null;save({all:1});renderDeckSel();renderData();toast('Sicherung geladen')}catch(err){toast('Das ist keine gültige Sicherung.')}return}
+  }
+});
+document.addEventListener('change',e=>{
+  const id=e.target.id,p=pendingImport;
+  if(id==='deckSel'){db.active=e.target.value;session=null;save();return show(view)}
+  if(p&&['impA','impB','impT','impHdr','impName','impLA','impLB'].includes(id)){
+    if(id==='impA')p.ca=+e.target.value;if(id==='impB')p.cb=+e.target.value;if(id==='impT')p.ct=+e.target.value;
+    if(id==='impName')p.name=e.target.value.trim()||p.file;if(id==='impLA')p.la=e.target.value;if(id==='impLB')p.lb=e.target.value;
+    if(id==='impHdr'){p.hasHeader=e.target.checked;if(!p.hasHeader){p.la='Sprache A';p.lb='Sprache B'}}
+    if(id==='impA'&&p.hasHeader)p.la=p.rows[0][p.ca];if(id==='impB'&&p.hasHeader)p.lb=p.rows[0][p.cb];
+    return renderData();
+  }
+  if(id==='setNew'){db.settings.newPer=clamp(+e.target.value||0,0,50);save()}
+  if(id==='setNext'){db.settings.nextMode=e.target.value;save()}
+  if(id==='setAfter'){db.settings.afterGoal=e.target.value;session=null;save()}
+  if(id==='setSize'){db.settings.size=clamp(+e.target.value||20,5,100);save()}
+  if(id==='setRet'){db.settings.retention=+e.target.value;save();rescheduleAll()}
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='setRet')document.getElementById('retOut').textContent=Math.round(e.target.value*100)+' %';
+  if(e.target.id==='wordSearch'){wordSearch=e.target.value;renderWords();const s=document.getElementById('wordSearch');s.focus();s.setSelectionRange(s.value.length,s.value.length)}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('overlay').innerHTML){document.getElementById('overlay').innerHTML='';return}
+  if(view!=='learn'||!session||!session.cur||e.metaKey||e.ctrlKey||e.altKey)return;
+  if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement&&document.activeElement.tagName))return;
+  const cur=session.cur;
+  if(!cur.answer){if(/^[1-5]$/.test(e.key)){e.preventDefault();answer(+e.key-1)}else if(e.key==='0'){e.preventDefault();dunno()}return}
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();commit()}
+});
+
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&session&&session.cur&&!session.cur.answer)session.cur.shown=performance.now();
+});
+
+/* ===================== Start ===================== */
+// Bisherige Antworten einmalig nach der aktuellen Logik neu bewerten (Positions-Anker + Zeitgrenzen aus der Trefferquote)
+// und jede betroffene Karte aus ihren echten Abfragezeitpunkten neu durchrechnen.
+const REGRADE_VERSION=2;
+function regradeAll(){
+  posCache=null;const pm=posModel(),ret=db.settings.retention;let cards=0,grades=0;
+  for(const k of Object.keys(db.cards)){
+    const c=db.cards[k];
+    if(!c||!c.reps||c.reps!==c.h.length)continue;   // gekürzter Verlauf: nicht neu rechnen
+    const L=cardLen(k);let n=null,diff=0;const slips=(c.slips||[]).slice();
+    c.h.forEach((e,i)=>{
+      let g=e[1];
+      if(e.length>=8&&e[7]===1){}   // von Hand bewertet: so lassen
+      else if(e.length>=7&&e[5]<=IDLE_MS){
+        const adj=pm.adjOf(e[5],e[6],L);
+        if(g===1&&n&&n.reps&&adj<pm.slip){slips.push([e[0],e[5],e[6]]);diff++;return}   // früherer schneller Fehler = Vertipper
+        if(g>1)g=adj>pm.slow?2:(adj<pm.fast&&n&&n.reps)?4:3;   // beim ersten Sehen höchstens „Gut“
+      }else if(e.length>=7&&g>1)g=3;
+      if(g!==e[1])diff++;
+      n=applyReview(n,g,e[0],ret);
+      n.h[n.h.length-1]=n.h[n.h.length-1].concat(e.slice(5));
+    });
+    if(diff&&n){if(slips.length)n.slips=slips.slice(-60);db.cards[k]=n;cards++;grades+=diff;const p=k.split('|');save({card:[p[0],p[1],p[2]]})}
+  }
+  posCache=null;
+  return{cards,grades};
+}
+// Nach einer Änderung der Zielbehaltensrate: Fälligkeit jeder Karte aus ihrer Stabilität neu berechnen
+function rescheduleAll(){
+  const ret=db.settings.retention;let n=0;
+  for(const k of Object.keys(db.cards)){
+    const c=db.cards[k];if(!c||!c.reps||c.lastG===1)continue;
+    const due=c.last+Math.max(1,Math.round(FSRS.interval(c.S,ret)))*DAY;
+    if(due!==c.due){db.cards[k]={...c,due};n++;const p=k.split('|');save({card:[p[0],p[1],p[2]]})}
+  }
+  session=null;
+  if(n)toast(`Termine von ${n} Karten an ${Math.round(ret*100)} % angepasst`);
+}
+function start(){
+  db.settings={...freshDb().settings,...db.settings};
+  if((db.settings.regraded||0)<REGRADE_VERSION&&Object.keys(db.cards).length){
+    const r=regradeAll();db.settings.regraded=REGRADE_VERSION;save();
+    if(r.grades)toast(`${r.grades} frühere Bewertungen bei ${r.cards} Karten neu berechnet`);
+  }
+  renderDeckSel();
+  let v='learn';try{v=localStorage.getItem(LS_KEY+'.view')||'learn'}catch(e){}
+  if(!document.getElementById('v-'+v))v='learn';
+  if(deck())startSession(false);
+  show(v);
+}
+async function boot(){
+  const local=loadLocal(),validLocal=local&&Array.isArray(local.decks)&&local.decks.length?local:null;
+  if(window.claude&&typeof window.claude.use==='function'){
+    document.getElementById('v-learn').innerHTML='<div class="center-msg"><p class="muted">Lernstand wird geladen …</p></div>';
+    let s=null;try{s=await window.claude.use('db')}catch(e){}
+    if(s){
+      try{
+        const remote=await loadServer(s);
+        srv=s;mode='server';
+        if(remote)db=remote;else{db=freshDb();localOffer=validLocal}
+        setSync('ok');start();return;
+      }catch(e){console.warn('db',e);toast('Server nicht erreichbar. Der Lernstand wird vorerst nur in diesem Browser gespeichert.')}
+    }
+  }
+  mode='local';db=validLocal;
+  if(!db){db=freshDb();seedSample(false);saveLocal()}
+  setSync('local');start();
+}
+boot();
+</script>

@@ -1,0 +1,25 @@
+# Keine Verzeichnislisten
+Options -Indexes
+AddDefaultCharset utf-8
+AddCharset utf-8 .csv .tsv .txt
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "no-referrer"
+    # App und Decks immer auf neue Fassung prüfen lassen (Safari hält sonst alte Versionen fest)
+    <FilesMatch "\.(html|csv|json)$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+</IfModule>
+
+# Versteckte Dateien (.lock, .htaccess, …) und die Konfiguration nie ausliefern
+<FilesMatch "^\.|^config\.php$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
