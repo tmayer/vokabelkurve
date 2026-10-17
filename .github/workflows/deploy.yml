@@ -4,7 +4,9 @@
 #   IONOS_SFTP_USER         SFTP-Benutzer aus dem IONOS-Kundenbereich
 #   IONOS_SFTP_PASSWORD     zugehöriges Passwort
 #   IONOS_TARGET_DIR        Zielordner auf dem Webspace, z. B. /tools/vocab
-#   IONOS_KNOWN_HOSTS       Ausgabe von: ssh-keyscan -p 22 <IONOS_SFTP_HOST>
+# Der Hostschlüssel des Servers ist unten als Fingerabdruck fest eingetragen (öffentliche Information).
+# Ändert IONOS den Schlüssel, bricht der Deploy ab; dann neuen Wert prüfen mit:
+#   ssh-keyscan -t ed25519 <host> | ssh-keygen -lf -
 # Nie überschrieben oder gelöscht werden: api/config.php (Hash des Geräteschlüssels) und data/ (Lernstand).
 name: Prüfen und deployen
 
@@ -38,20 +40,17 @@ jobs:
       - uses: actions/checkout@v5
       - name: lftp installieren
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
-      - name: Hostschlüssel hinterlegen
-        run: |
-          mkdir -p ~/.ssh
-          printf '%s\n' "${{ secrets.IONOS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-      - name: Hostschlüssel prüfen
+      - name: Hostschlüssel holen und prüfen
         env:
           HOST: ${{ secrets.IONOS_SFTP_HOST }}
+          FINGERPRINT: SHA256:1gx2w8Rtv3wCgi7Jh8myf/KVd72cRQbow03UP8P095Q   # ED25519-Schlüssel des IONOS-SFTP-Servers
         run: |
-          # Zeigt nur Fingerabdrücke (nicht geheim), damit man sieht, ob Secret und Server zusammenpassen
-          echo "Einträge im Secret: $(grep -cv '^#' ~/.ssh/known_hosts || true)"
-          echo "Fingerabdrücke im Secret:"; ssh-keygen -lf ~/.ssh/known_hosts || true
-          echo "Fingerabdrücke vom Server:"; ssh-keyscan -p 22 "$HOST" 2>/dev/null | ssh-keygen -lf - || true
-          ssh-keygen -F "$HOST" >/dev/null || { echo "::error::IONOS_KNOWN_HOSTS enthält keinen Eintrag für den Hostnamen aus IONOS_SFTP_HOST. Mit ssh-keyscan für genau diesen Namen neu erzeugen."; exit 1; }
+          mkdir -p ~/.ssh
+          ssh-keyscan -t ed25519 -p 22 "$HOST" 2>/dev/null > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          got=$(ssh-keygen -lf ~/.ssh/known_hosts | awk '{print $2}')
+          echo "Server: $got"
+          [ "$got" = "$FINGERPRINT" ] || { echo "::error::Hostschlüssel des Servers ($got) passt nicht zum eingetragenen Fingerabdruck. Nichts hochgeladen."; exit 1; }
       - name: Per SFTP hochladen
         env:
           HOST: ${{ secrets.IONOS_SFTP_HOST }}
