@@ -21,9 +21,9 @@ concurrency:
 
 jobs:
   pruefen:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: PHP-Syntax
         run: for f in webspace/api/*.php; do php -l "$f"; done
       - name: Decks
@@ -32,10 +32,10 @@ jobs:
   deployen:
     needs: pruefen
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: ionos
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: lftp installieren
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
       - name: Hostschlüssel hinterlegen
@@ -43,6 +43,15 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.IONOS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
+      - name: Hostschlüssel prüfen
+        env:
+          HOST: ${{ secrets.IONOS_SFTP_HOST }}
+        run: |
+          # Zeigt nur Fingerabdrücke (nicht geheim), damit man sieht, ob Secret und Server zusammenpassen
+          echo "Einträge im Secret: $(grep -cv '^#' ~/.ssh/known_hosts || true)"
+          echo "Fingerabdrücke im Secret:"; ssh-keygen -lf ~/.ssh/known_hosts || true
+          echo "Fingerabdrücke vom Server:"; ssh-keyscan -p 22 "$HOST" 2>/dev/null | ssh-keygen -lf - || true
+          ssh-keygen -F "$HOST" >/dev/null || { echo "::error::IONOS_KNOWN_HOSTS enthält keinen Eintrag für den Hostnamen aus IONOS_SFTP_HOST. Mit ssh-keyscan für genau diesen Namen neu erzeugen."; exit 1; }
       - name: Per SFTP hochladen
         env:
           HOST: ${{ secrets.IONOS_SFTP_HOST }}
