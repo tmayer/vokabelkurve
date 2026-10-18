@@ -247,6 +247,12 @@ button.brand{background:none;border:0;padding:4px 2px;color:inherit;cursor:point
 .deckcard.active{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .dc-name{font-family:var(--f-display);font-weight:700;font-size:17px;display:flex;gap:8px;align-items:center;min-width:0;overflow-wrap:anywhere}
 .dc-tag{font-family:var(--f-body);font-size:11.5px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;flex:none}
+.dc-tag.dc-rest{color:var(--muted);border-color:var(--line)}
+.deckcard.paused{background:var(--surface-2)}
+.deckcard.paused .dc-stack,.deckcard.paused .dc-name{opacity:.6}
+.dc-actions{display:flex;justify-content:flex-end}
+.dc-pause{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:pointer}
+@media (hover:hover) and (pointer:fine){.dc-pause:hover{color:var(--ink);border-color:var(--ink)}}
 .dc-sub{font-size:13px;color:var(--muted)}
 .calpanel{display:grid;gap:10px;margin-top:6px}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
@@ -1315,25 +1321,33 @@ function fmtNextDue(x){
   const k=`${x.n} ${x.n===1?'Karte':'Karten'}`;
   return x.off===1?`Nächste fällig <b>morgen, ${date}</b> · ${k}`:`Nächste fällig <b>${date}</b> (in ${x.off} Tagen) · ${k}`;
 }
+// Ruhemodus: pausierte Decks zählen nicht zum Tagespensum über alle Decks und nicht zum Kalender.
+// Lernen kann man sie trotzdem, wenn man sie auswählt; ihre Karten werden dann ganz normal geplant.
+const isPaused=d=>(db.settings.paused||[]).includes(d.id);
+function togglePause(id){
+  const p=new Set(db.settings.paused||[]);p.has(id)?p.delete(id):p.add(id);
+  db.settings.paused=[...p];save();renderDecks();
+}
 function renderDecks(){
   const el=document.getElementById('v-decks');
   if(!db.decks.length){el.innerHTML='<p class="muted">Noch kein Deck vorhanden.</p>';return}
-  const list=db.decks.map(d=>{const cnt=Object.fromEntries(ORDER.map(s=>[s,0]));itemStats(d,'word').forEach(i=>cnt[i.status]++);return{d,cnt,last:deckLastUsed(d),tp:todayPlan(d),learned:learnStats(d).learned}})
-    .sort((a,b)=>b.last-a.last||shortName(a.d).localeCompare(shortName(b.d),'de'));
-  const sum=list.reduce((a,x)=>({now:a.now+x.tp.dueNow,later:a.later+x.tp.later,neu:a.neu+x.tp.newLeft}),{now:0,later:0,neu:0});
+  const list=db.decks.map(d=>{const cnt=Object.fromEntries(ORDER.map(s=>[s,0]));itemStats(d,'word').forEach(i=>cnt[i.status]++);return{d,cnt,paused:isPaused(d),last:deckLastUsed(d),tp:todayPlan(d),learned:learnStats(d).learned}})
+    .sort((a,b)=>a.paused-b.paused||b.last-a.last||shortName(a.d).localeCompare(shortName(b.d),'de'));
+  const sum=list.filter(x=>!x.paused).reduce((a,x)=>({now:a.now+x.tp.dueNow,later:a.later+x.tp.later,neu:a.neu+x.tp.newLeft}),{now:0,later:0,neu:0});
   el.innerHTML=`
     <div class="decksum"><p class="eyebrow">Heute über alle Decks</p>
       <div class="todaybar"><span><b class="hot">${sum.now}</b> jetzt fällig</span><span><b>${sum.later}</b> später heute</span><span><b>${sum.neu}</b> neu</span></div></div>
-    <div class="deckcards">${list.map(x=>`<button class="deckcard${x.d.id===db.active?' active':''}" data-pick="${esc(x.d.id)}">
-      <span class="dc-name">${esc(deckLabel(x.d))}${x.d.id===db.active?'<span class="dc-tag">aktiv</span>':''}</span>
+    <div class="deckcards">${list.map(x=>`<button class="deckcard${x.d.id===db.active?' active':''}${x.paused?' paused':''}" data-pick="${esc(x.d.id)}">
+      <span class="dc-name">${esc(deckLabel(x.d))}${x.d.id===db.active?'<span class="dc-tag">aktiv</span>':''}${x.paused?'<span class="dc-tag dc-rest">Ruhemodus</span>':''}</span>
       <span class="dc-sub">${esc(dirShort(x.d,0))} · ${nf(x.learned)} von ${nf(x.d.words.length)} gelernt · zuletzt ${fmtAgo(x.last)}</span>
       <span class="dc-barwrap"><span class="stack dc-stack" role="img" aria-label="Verteilung nach Status">${ORDER.map(s=>`<span class="st-${s}" style="flex-grow:${x.cnt[s]}" title="${STATUS[s].l}: ${x.cnt[s]}"></span>`).join('')}</span>
         ${ORDER.some(s=>s!=='new'&&x.cnt[s])?`<span class="dc-pop">${ORDER.filter(s=>x.cnt[s]).map(s=>`<span class="st-${s}"><i></i>${x.cnt[s]} ${STATUS[s].l}</span>`).join('')}</span>`:''}</span>
       ${ORDER.some(s=>s!=='new'&&x.cnt[s])?`<span class="dc-legend">${ORDER.filter(s=>s!=='new'&&x.cnt[s]).map(s=>`<span class="st-${s}"><i></i>${x.cnt[s]} ${STATUS[s].l}</span>`).join('')}</span>`:''}
-      <span class="dc-today"><span><b class="${x.tp.dueNow?'hot':''}">${x.tp.dueNow}</b> jetzt fällig</span><span><b>${x.tp.later}</b> später heute</span><span><b>${x.tp.newLeft}</b> neu</span></span>
-      ${x.tp.dueNow?'':(n=>n?`<span class="dc-next">${n}</span>`:'')(fmtNextDue(nextDue(x.d)))}
+      ${x.paused?`<span class="dc-next">Zählt nicht zum Tagespensum und nicht zum Kalender${x.tp.dueNow?` · ${x.tp.dueNow} Karten wären fällig`:''}</span>`:`<span class="dc-today"><span><b class="${x.tp.dueNow?'hot':''}">${x.tp.dueNow}</b> jetzt fällig</span><span><b>${x.tp.later}</b> später heute</span><span><b>${x.tp.newLeft}</b> neu</span></span>
+      ${x.tp.dueNow?'':(n=>n?`<span class="dc-next">${n}</span>`:'')(fmtNextDue(nextDue(x.d)))}`}
+      <span class="dc-actions"><span class="dc-pause" role="button" tabindex="0" data-pause="${esc(x.d.id)}">${x.paused?'Wieder aktivieren':'In Ruhemodus setzen'}</span></span>
     </button>`).join('')}</div>
-    <p class="muted" style="font-size:12.5px">Sortiert nach letzter Nutzung. Tippe auf ein Deck, um damit zu lernen.</p>
+    <p class="muted" style="font-size:12.5px">Sortiert nach letzter Nutzung, Decks im Ruhemodus stehen unten. Tippe auf ein Deck, um damit zu lernen.</p>
     ${dueCalendar()}`;
 }
 // Kalender: wie viele Wiederholungen an welchem Tag fällig werden, über alle Decks (abgefragte Richtungen, ohne neue Wörter).
@@ -1344,7 +1358,7 @@ function dueCalendar(){
   const mon=new Date(sod);mon.setDate(mon.getDate()-((mon.getDay()+6)%7));   // Montag dieser Woche
   for(let i=0;i<CAL_WEEKS*7;i++){const dt=new Date(mon);dt.setDate(mon.getDate()+i);days.push({dt,ts:dt.getTime(),n:0,by:{}})}
   const idx=new Map(days.map((x,i)=>[x.ts,i])),last=days[days.length-1].ts;
-  for(const d of db.decks)for(const w of d.words)for(const dir of dirs){
+  for(const d of db.decks.filter(d=>!isPaused(d)))for(const w of d.words)for(const dir of dirs){
     const c=db.cards[key(d.id,w.id,dir)];if(!c||!c.reps)continue;
     let ts=sod;if(c.due>=sod+DAY){const x=new Date(c.due);x.setHours(0,0,0,0);ts=x.getTime()}
     if(ts>last)continue;
@@ -1357,9 +1371,9 @@ function dueCalendar(){
   const fmtD=dt=>dt.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'numeric'});
   const detail=sel.n?Object.entries(sel.by).sort((a,b)=>b[1]-a[1]).map(([id,n])=>{const d=db.decks.find(x=>x.id===id);return`${esc(d?deckLabel(d):id)} <b>${n}</b>`}).join(' · '):'nichts fällig';
   return`<div class="panel calpanel"><h3>Kalender: fällige Wiederholungen</h3>
-    <p class="muted" style="font-size:13px">Alle Decks zusammen, ohne neue Wörter. „Heute“ enthält Überfälliges. Nächste 7 Tage: <b class="num">${sum(7)}</b> · nächste 4 Wochen: <b class="num">${sum(28)}</b></p>
+    <p class="muted" style="font-size:13px">Alle aktiven Decks zusammen (ohne Ruhemodus), ohne neue Wörter. „Heute“ enthält Überfälliges. Nächste 7 Tage: <b class="num">${sum(7)}</b> · nächste 4 Wochen: <b class="num">${sum(28)}</b></p>
     <div class="cal">${['Mo','Di','Mi','Do','Fr','Sa','So'].map(x=>`<span class="cal-h">${x}</span>`).join('')}
-    ${days.map(x=>{if(x.ts<sod)return'<span class="cal-d past"></span>';const fi=future.indexOf(x),lbl=(x.dt.getDate()===1||fi===0?x.dt.getDate()+'.'+(x.dt.getMonth()+1)+'.':x.dt.getDate()+'.');
+    ${days.map(x=>{if(x.ts<sod)return'<span class="cal-d past"></span>';const fi=future.indexOf(x),lbl=(x.dt.getDate()===1?x.dt.getDate()+'.'+(x.dt.getMonth()+1)+'.':x.dt.getDate()+'.');
       const a=x.n?Math.round(12+x.n/max*78):0;return`<button class="cal-d${x.ts===sod?' today':''}${fi===si?' sel':''}${a>=50?' hi':''}" data-cal="${fi}" style="--a:${a}%" aria-label="${fmtD(x.dt)}: ${x.n} fällig"><span class="dn">${lbl}</span><b>${x.n||''}</b></button>`}).join('')}</div>
     <p class="caldetail"><span class="muted">${sel.ts===sod?'Heute':fmtD(sel.dt)}:</span> ${detail}</p></div>`;
 }
@@ -1590,6 +1604,7 @@ document.addEventListener('click',e=>{
     if(openPop)openPop.classList.remove('pop-open');if(!was)card.classList.add('pop-open');return;
   }
   if(openPop){openPop.classList.remove('pop-open');return}
+  const pz=e.target.closest('[data-pause]');if(pz)return togglePause(pz.dataset.pause);
   if(view==='learn'&&session&&session.cur&&session.cur.answer&&e.target.closest('#v-learn')&&!e.target.closest('[data-act="stop"],[data-view]'))return commit();
   const b=e.target.closest('button,[data-word],[data-close]');if(!b)return;
   const ds=b.dataset;

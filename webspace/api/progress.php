@@ -157,6 +157,9 @@ if (isset($body['settings'])) {
     if (isset($s['dirMode']) && in_array($s['dirMode'], ['both', '0', '1'], true)) $clean['dirMode'] = $s['dirMode'];
     if (isset($s['ovMode']) && in_array($s['ovMode'], ['word', '0', '1'], true)) $clean['ovMode'] = $s['ovMode'];
     if (isset($s['active']) && is_string($s['active']) && preg_match('/^[a-z0-9-]{1,80}$/', $s['active'])) $clean['active'] = $s['active'];
+    if (isset($s['paused']) && is_array($s['paused']) && array_is_list($s['paused']) && count($s['paused']) <= 100) {
+        $clean['paused'] = array_values(array_filter($s['paused'], fn($x) => is_string($x) && preg_match('/^[a-z0-9-]{1,80}$/', $x)));
+    }
     writeJson(VK_DATA_DIR . '/settings.json', (object) $clean);
 }
 
