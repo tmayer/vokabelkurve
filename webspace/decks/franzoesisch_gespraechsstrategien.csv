@@ -1,0 +1,501 @@
+Deutsch;Französisch;Thema;Wichtigkeit (1 = am wichtigsten)
+Entschuldigung, ich habe nicht verstanden.;Pardon, je n'ai pas compris.;Nicht verstanden;1
+Ich verstehe nicht ganz.;Je ne comprends pas très bien.;Nicht verstanden;1
+Können Sie das bitte wiederholen?;Vous pouvez répéter, s'il vous plaît ?;Nicht verstanden;1
+Noch einmal, bitte.;Encore une fois, s'il vous plaît.;Nicht verstanden;1
+Etwas langsamer, bitte.;Plus lentement, s'il vous plaît.;Nicht verstanden;1
+Können Sie langsamer sprechen?;Vous pouvez parler plus lentement ?;Nicht verstanden;1
+Was bedeutet das?;Qu'est-ce que ça veut dire ?;Nicht verstanden;1
+Was heißt „…“?;Ça veut dire quoi, « … » ?;Nicht verstanden;1
+Können Sie das aufschreiben?;Vous pouvez l'écrire ?;Nicht verstanden;1
+Können Sie es mir zeigen?;Vous pouvez me montrer ?;Nicht verstanden;1
+Können Sie es auf der Karte zeigen?;Vous pouvez me montrer sur la carte ?;Nicht verstanden;1
+Wie viel, haben Sie gesagt?;C'est combien, vous avez dit ?;Nicht verstanden;1
+Ich habe es akustisch nicht verstanden.;Je n'ai pas bien entendu.;Nicht verstanden;1
+Können Sie es anders sagen?;Vous pouvez le dire autrement ?;Nicht verstanden;1
+Habe ich das richtig verstanden?;J'ai bien compris ?;Nicht verstanden;1
+Sie sprechen zu schnell für mich.;Vous parlez trop vite pour moi.;Nicht verstanden;1
+Ach so!;Ah, d'accord !;Nicht verstanden;1
+Dieses Wort kenne ich nicht.;Je ne connais pas ce mot.;Nicht verstanden;1
+Ich spreche nur ein bisschen Französisch.;Je parle juste un peu français.;Sprachhilfe;1
+Ich lerne Französisch.;J'apprends le français.;Sprachhilfe;1
+Ich fange gerade erst mit Französisch an.;Je débute en français.;Sprachhilfe;1
+Mein Französisch ist nicht sehr gut.;Mon français n'est pas très bon.;Sprachhilfe;1
+Sprechen Sie Englisch?;Vous parlez anglais ?;Sprachhilfe;1
+Ich komme aus Deutschland.;Je viens d'Allemagne.;Sprachhilfe;1
+Wie sagt man … auf Französisch?;Comment on dit … en français ?;Sprachhilfe;1
+Wie heißt das auf Französisch?;Comment ça s'appelle en français ?;Sprachhilfe;1
+Ich weiß nicht, wie ich das sagen soll.;Je ne sais pas comment le dire.;Sprachhilfe;1
+Ich zeige es Ihnen auf meinem Handy.;Je vous montre sur mon téléphone.;Sprachhilfe;1
+Einen Moment, bitte.;Un instant, s'il vous plaît.;Zeit gewinnen;1
+Warten Sie, ich überlege.;Attendez, je réfléchis.;Zeit gewinnen;1
+Wie soll ich sagen …;Comment dire …;Zeit gewinnen;1
+Alles klar, passt.;Ça marche.;Reagieren;1
+Kein Ding.;Pas de souci.;Reagieren;1
+Das passt mir.;Ça me va.;Reagieren;1
+Ja, gern.;Oui, avec plaisir.;Reagieren;1
+Ja, genau das.;Oui, c'est ça.;Reagieren;1
+Macht nichts.;Ce n'est pas grave.;Reagieren;1
+Ach wirklich?;Ah bon ?;Reagieren;1
+Warum nicht?;Pourquoi pas ?;Reagieren;1
+Das ist sehr nett von Ihnen.;C'est très gentil de votre part.;Reagieren;1
+Nein danke, ich schaue nur.;Non merci, je regarde juste.;Ablehnen & Einschränken;1
+Nein, schon gut.;Non, c'est bon.;Ablehnen & Einschränken;1
+Das ist nicht nötig.;Ce n'est pas la peine.;Ablehnen & Einschränken;1
+Das ist alles, danke.;C'est tout, merci.;Ablehnen & Einschränken;1
+Ohne …, bitte.;Sans …, s'il vous plaît.;Ablehnen & Einschränken;1
+Tausend Dank!;Merci mille fois !;Höflich & idiomatisch;1
+Danke, das ist echt nett.;Merci, c'est super sympa.;Höflich & idiomatisch;1
+Ich danke Ihnen.;Je vous remercie.;Höflich & idiomatisch;1
+Trotzdem danke.;Merci quand même.;Höflich & idiomatisch;1
+Keine Ursache.;Il n'y a pas de quoi.;Höflich & idiomatisch;1
+Bis nachher!;À tout à l'heure !;Höflich & idiomatisch;1
+Schönen Tag noch!;Bonne journée !;Höflich & idiomatisch;1
+Wie geht's? Alles gut?;Ça va ?;Höflich & idiomatisch;1
+Entschuldigen Sie die Störung.;Excusez-moi de vous déranger.;Höflich & idiomatisch;1
+Entschuldigung, darf ich mal vorbei?;Pardon, je peux passer ?;Höflich & idiomatisch;1
+Bitte, nur zu.;Allez-y.;Höflich & idiomatisch;1
+Darf ich?;Je peux ?;Höflich & idiomatisch;1
+Es tut mir wirklich leid.;Je suis vraiment désolé.;Höflich & idiomatisch;1
+Ich nehme …;Je vais prendre …;Bitten & Fragen;1
+Könnte ich … haben?;Je pourrais avoir … ?;Bitten & Fragen;1
+Ich würde gern …;J'aimerais …;Bitten & Fragen;1
+Hätten Sie vielleicht …?;Vous auriez … ?;Bitten & Fragen;1
+Haben Sie …?;Vous avez … ?;Bitten & Fragen;1
+Gibt es hier …?;Il y a … ici ?;Bitten & Fragen;1
+Was macht das?;Ça fait combien ?;Bitten & Fragen;1
+Könnten wir zahlen?;On pourrait avoir l'addition ?;Bitten & Fragen;1
+Kann ich mit Karte zahlen?;Je peux payer par carte ?;Bitten & Fragen;1
+Können Sie mir helfen?;Vous pouvez m'aider ?;Bitten & Fragen;1
+Darf ich Sie etwas fragen?;Je peux vous poser une question ?;Bitten & Fragen;1
+Ist hier frei?;C'est libre ?;Bitten & Fragen;1
+Wie komme ich zu …?;Pour aller à …, s'il vous plaît ?;Bitten & Fragen;1
+Bin ich hier richtig für …?;C'est bien ici pour … ?;Bitten & Fragen;1
+In welche Richtung ist das?;C'est par où ?;Bitten & Fragen;1
+Um wie viel Uhr?;À quelle heure ?;Bitten & Fragen;1
+Was empfehlen Sie mir?;Qu'est-ce que vous me conseillez ?;Bitten & Fragen;1
+Kann ich Ihnen helfen?;Je peux vous aider ?;Was man gefragt wird;1
+Was darf es sein?;Je vous écoute.;Was man gefragt wird;1
+Wer ist dran?;C'est à qui ?;Was man gefragt wird;1
+Sie sind dran.;C'est à vous.;Was man gefragt wird;1
+Sonst noch etwas?;Et avec ceci ?;Was man gefragt wird;1
+Ist das alles?;Ce sera tout ?;Was man gefragt wird;1
+Das macht zwölf Euro.;Ça fait douze euros.;Was man gefragt wird;1
+Bar oder mit Karte?;En espèces ou par carte ?;Was man gefragt wird;1
+Zahlen Sie mit Karte?;Vous payez par carte ?;Was man gefragt wird;1
+Zum Hieressen oder zum Mitnehmen?;Sur place ou à emporter ?;Was man gefragt wird;1
+Es gibt keins mehr.;Il n'y en a plus.;Was man gefragt wird;1
+Haben Sie reserviert?;Vous avez réservé ?;Was man gefragt wird;1
+Auf welchen Namen?;À quel nom ?;Was man gefragt wird;1
+Für wie viele Personen?;Pour combien de personnes ?;Was man gefragt wird;1
+Wie viele sind Sie?;Vous êtes combien ?;Was man gefragt wird;1
+Haben Sie gewählt?;Vous avez choisi ?;Was man gefragt wird;1
+Und zu trinken?;Et comme boisson ?;Was man gefragt wird;1
+Hat es geschmeckt?;Ça a été ?;Was man gefragt wird;1
+Bitte schön, hier. (beim Überreichen);Voilà.;Was man gefragt wird;1
+Ihr Name, bitte?;Votre nom, s'il vous plaît ?;Was man gefragt wird;1
+Sprechen Sie Französisch?;Vous parlez français ?;Was man gefragt wird;1
+Woher kommen Sie?;Vous venez d'où ?;Was man gefragt wird;1
+Nein, ich meinte …;Non, je voulais dire …;Missverständnisse;1
+Das habe ich nicht bestellt.;Ce n'est pas ce que j'ai commandé.;Missverständnisse;1
+Ich glaube, da ist ein Fehler.;Je crois qu'il y a une erreur.;Missverständnisse;1
+Nein, das ist es nicht.;Non, ce n'est pas ça.;Missverständnisse;1
+Ich brauche Hilfe.;J'ai besoin d'aide.;Hilfe & Probleme;1
+Ich habe ein kleines Problem.;J'ai un souci.;Hilfe & Probleme;1
+Ich habe mich verlaufen.;Je suis perdu.;Hilfe & Probleme;1
+Es funktioniert nicht.;Ça ne marche pas.;Hilfe & Probleme;1
+Die Karte geht nicht durch.;La carte ne passe pas.;Hilfe & Probleme;1
+Was muss ich machen?;Qu'est-ce que je dois faire ?;Hilfe & Probleme;1
+Mir geht es nicht gut.;Je ne me sens pas bien.;Hilfe & Probleme;1
+Ich bin … (Name);Moi, c'est …;Gespräch beginnen & beenden;1
+Ich bin hier im Urlaub.;Je suis en vacances ici.;Gespräch beginnen & beenden;1
+Ich muss los.;Il faut que j'y aille.;Gespräch beginnen & beenden;1
+Hallo? (am Telefon);Allô ?;Telefon & Nachrichten;1
+Moment, eins nach dem anderen.;Attendez, une chose à la fois.;Gespräch steuern;1
+Und dann?;Et après ?;Gespräch steuern;1
+Ich wiederhole, um sicherzugehen: …;Je répète pour être sûr : …;Gespräch steuern;1
+Wo genau?;Où exactement ?;Gespräch steuern;1
+Hier oder dort?;Ici ou là-bas ?;Gespräch steuern;1
+Ich bin mir nicht sicher.;Je ne suis pas sûr.;Gespräch steuern;1
+Wie lange dauert das?;Ça prend combien de temps ?;Regeln & Abläufe;1
+Wie lange muss ich warten?;Je dois attendre combien de temps ?;Regeln & Abläufe;1
+Ist das kostenlos?;C'est gratuit ?;Regeln & Abläufe;1
+Wo bezahle ich?;Je paie où ?;Regeln & Abläufe;1
+Was steht da?;Qu'est-ce qui est écrit là ?;Regeln & Abläufe;1
+Entschuldigung, haben Sie kurz Zeit?;Excusez-moi, vous avez une minute ?;Gespräch beginnen & beenden;1
+Ich hätte eine kurze Frage.;J'ai une petite question.;Gespräch beginnen & beenden;1
+Sie haben mir sehr geholfen.;Vous m'avez beaucoup aidé.;Gespräch beginnen & beenden;1
+Schriftlich ist es für mich einfacher.;C'est plus facile pour moi par écrit.;Telefon & Nachrichten;1
+Ich bin nicht von hier.;Je ne suis pas d'ici.;Gespräch beginnen & beenden;1
+Das Ding da.;Le truc, là.;Umschreiben;1
+Es ist so ähnlich wie …;C'est un peu comme …;Umschreiben;1
+Das ist eine Art …;C'est une sorte de …;Umschreiben;1
+Das ist ein Ding zum …;C'est un truc pour …;Umschreiben;1
+Man benutzt es, um …;On l'utilise pour …;Umschreiben;1
+Das ist etwas, das man …;C'est quelque chose qu'on …;Umschreiben;1
+Das ist jemand, der …;C'est quelqu'un qui …;Umschreiben;1
+Das ist ein Ort, wo …;C'est un endroit où …;Umschreiben;1
+Das ist, wenn …;C'est quand …;Umschreiben;1
+Es sieht aus wie …;Ça ressemble à …;Umschreiben;1
+Wie …, nur kleiner.;C'est comme …, mais plus petit.;Umschreiben;1
+Das Gegenteil von …;Le contraire de …;Umschreiben;1
+Es ist nicht …, eher …;Ce n'est pas …, c'est plutôt …;Umschreiben;1
+Auf Englisch sagt man …;En anglais, on dit …;Umschreiben;1
+So wie hier. (mit Geste);Comme ça.;Umschreiben;1
+Ungefähr eine Stunde.;À peu près une heure.;Umschreiben;1
+Eher das da.;Plutôt celui-là.;Umschreiben;1
+Es ist ungefähr so groß.;C'est grand comme ça.;Beschreiben;1
+Ich glaube, das ist kaputt.;C'est cassé, je crois.;Beschreiben;1
+Das mit dem …;Celui avec …;Beschreiben;1
+Ich brauche ein Ding, um das aufzumachen.;Il me faut un truc pour ouvrir ça.;Allzweckwörter im Satz;1
+Das Gerät funktioniert nicht.;L'appareil ne marche pas.;Allzweckwörter im Satz;1
+Welche Unterlagen brauche ich?;De quels papiers j'ai besoin ?;Allzweckwörter im Satz;1
+Kennen Sie hier etwas, wo man gut essen kann?;Vous connaissez un endroit pour bien manger ?;Allzweckwörter im Satz;1
+Wo soll ich das hintun?;Je le mets où ?;Allzweckwörter im Satz;1
+Darf ich mir eins nehmen?;Je peux en prendre un ?;Allzweckwörter im Satz;1
+Darf ich das benutzen?;Je peux utiliser ça ?;Allzweckwörter im Satz;1
+Wissen Sie, was das ist?;Vous voyez ce que c'est ?;Gespräch steuern;1
+Wissen Sie, wovon ich rede?;Vous voyez de quoi je parle ?;Gespräch steuern;1
+Was ich sagen will, ist: …;Ce que je veux dire, c'est que …;Gespräch steuern;1
+Was ich suche, ist …;Ce que je cherche, c'est …;Gespräch steuern;1
+Was ich brauche, ist …;Ce dont j'ai besoin, c'est …;Gespräch steuern;1
+Das Problem ist, dass …;Le problème, c'est que …;Gespräch steuern;1
+Ich erkläre es Ihnen anders.;Je vais vous expliquer autrement.;Gespräch steuern;1
+Es liegt mir auf der Zunge!;Je l'ai sur le bout de la langue !;Zeit gewinnen;1
+Können Sie einfacher sprechen?;Vous pouvez parler plus simplement ?;Nicht verstanden;1
+Können Sie es als Zahl aufschreiben?;Vous pouvez me l'écrire en chiffres ?;Nicht verstanden;1
+Heißt das Ja oder Nein?;Ça veut dire « oui » ou « non » ?;Nicht verstanden;1
+Ich kenne das Wort nicht, aber …;Je ne connais pas le mot, mais …;Umschreiben;1
+Wie nennt man jemanden, der …?;Comment on appelle quelqu'un qui … ?;Umschreiben;1
+Wie heißt das Ding, das …?;Comment on appelle le truc qui … ?;Umschreiben;1
+Wofür ist das?;Ça sert à quoi ?;Allzweckwörter im Satz;1
+Wer ist dafür zuständig?;Qui s'occupe de ça ?;Allzweckwörter im Satz;1
+Geht das auch mit meinem Handy?;Ça marche aussi avec mon téléphone ?;Allzweckwörter im Satz;2
+Können Sie es langsamer wiederholen?;Vous pouvez répéter plus lentement ?;Nicht verstanden;2
+Können Sie den letzten Teil wiederholen?;Vous pouvez répéter la fin ?;Nicht verstanden;2
+Was heißt das genau?;C'est-à-dire ?;Nicht verstanden;2
+Um wie viel Uhr, haben Sie gesagt?;À quelle heure, vous avez dit ?;Nicht verstanden;2
+Können Sie den Preis wiederholen?;Vous pouvez répéter le prix ?;Nicht verstanden;2
+Fünfzehn oder fünfzig?;Quinze ou cinquante ?;Nicht verstanden;2
+Zwei oder zwölf?;Deux ou douze ?;Nicht verstanden;2
+Ist das heute oder morgen?;C'est aujourd'hui ou demain ?;Nicht verstanden;2
+Ist das links oder rechts?;C'est à gauche ou à droite ?;Nicht verstanden;2
+Geradeaus, richtig?;Tout droit, c'est ça ?;Nicht verstanden;2
+Entschuldigung, wie war der Name?;Pardon, c'était quoi, le nom ?;Nicht verstanden;2
+Welche Nummer ist das?;C'est quel numéro ?;Nicht verstanden;2
+Was haben Sie gesagt?;Vous avez dit quoi ?;Nicht verstanden;2
+Wie? (= wie bitte);Comment ?;Nicht verstanden;2
+Das habe ich nicht mitbekommen.;Je n'ai pas saisi.;Nicht verstanden;2
+Ich habe gar nichts verstanden.;Je n'ai rien compris.;Nicht verstanden;2
+Ich habe nur die Hälfte verstanden.;Je n'ai compris que la moitié.;Nicht verstanden;2
+Ich habe das letzte Wort nicht verstanden.;Je n'ai pas compris le dernier mot.;Nicht verstanden;2
+Ich komme gerade nicht ganz mit.;Je suis un peu perdu.;Nicht verstanden;2
+Mit einfacheren Worten, bitte.;Avec des mots plus simples, s'il vous plaît.;Nicht verstanden;2
+Können Sie mir das erklären?;Vous pouvez m'expliquer ?;Nicht verstanden;2
+Was ist der Unterschied?;C'est quoi, la différence ?;Nicht verstanden;2
+Wie schreibt man das?;Ça s'écrit comment ?;Nicht verstanden;2
+Können Sie es buchstabieren?;Vous pouvez épeler ?;Nicht verstanden;2
+Meinen Sie …?;Vous voulez dire … ?;Nicht verstanden;2
+Wenn ich richtig verstehe, …;Si je comprends bien, …;Nicht verstanden;2
+Ich muss also …?;Donc je dois … ?;Nicht verstanden;2
+Ich bin nicht sicher, ob ich das verstanden habe.;Je ne suis pas sûr d'avoir compris.;Nicht verstanden;2
+Können Sie lauter sprechen?;Vous pouvez parler plus fort ?;Nicht verstanden;2
+Ah, jetzt verstehe ich.;Ah, maintenant je comprends.;Nicht verstanden;2
+Jetzt hab ich's!;Ça y est, j'ai compris !;Nicht verstanden;2
+Ah, ich weiß, was Sie meinen.;Ah, je vois ce que vous voulez dire.;Nicht verstanden;2
+Ich bin Anfänger.;Je suis débutant.;Sprachhilfe;2
+Entschuldigung, mein Französisch ist nicht perfekt.;Désolé, mon français n'est pas parfait.;Sprachhilfe;2
+Ich verstehe mehr, als ich sprechen kann.;Je comprends mieux que je ne parle.;Sprachhilfe;2
+Sprechen Sie Deutsch?;Vous parlez allemand ?;Sprachhilfe;2
+Können wir Englisch sprechen?;On peut parler en anglais ?;Sprachhilfe;2
+Ich versuche es lieber auf Französisch.;Je préfère essayer en français.;Sprachhilfe;2
+Wie sagt man das noch mal?;Comment on dit ça, déjà ?;Sprachhilfe;2
+Können Sie mir helfen, das zu sagen?;Vous pouvez m'aider à le dire ?;Sprachhilfe;2
+Ich muss nach Worten suchen.;Je cherche mes mots.;Sprachhilfe;2
+Mir fällt das Wort nicht ein.;Le mot ne me vient pas.;Sprachhilfe;2
+Ich habe das Wort vergessen.;J'ai oublié le mot.;Sprachhilfe;2
+Wie spricht man das aus?;Ça se prononce comment ?;Sprachhilfe;2
+Sagt man das so?;On dit comme ça ?;Sprachhilfe;2
+Ist das richtig so?;C'est correct ?;Sprachhilfe;2
+Korrigieren Sie mich ruhig.;N'hésitez pas à me corriger.;Sprachhilfe;2
+Danke für Ihre Geduld.;Merci pour votre patience.;Sprachhilfe;2
+Das ist nicht leicht für mich.;Ce n'est pas facile pour moi.;Sprachhilfe;2
+Ich schaue es auf meinem Handy nach.;Je regarde sur mon téléphone.;Sprachhilfe;2
+Moment, ich übersetze.;Attendez, je traduis.;Sprachhilfe;2
+So etwas wie …;Quelque chose comme …;Umschreiben;2
+Nur eine Sekunde.;Juste une seconde.;Zeit gewinnen;2
+Einen Moment, ich schaue nach.;Un instant, je regarde.;Zeit gewinnen;2
+Lassen Sie mich überlegen.;Laissez-moi réfléchir.;Zeit gewinnen;2
+Äh …;Euh …;Zeit gewinnen;2
+Also, …;Alors, …;Zeit gewinnen;2
+Na gut, …;Bon, …;Zeit gewinnen;2
+Ich meine …;Je veux dire …;Zeit gewinnen;2
+Das heißt …;C'est-à-dire …;Zeit gewinnen;2
+Sagen wir mal …;Disons que …;Zeit gewinnen;2
+Eigentlich …;En fait, …;Zeit gewinnen;2
+Deshalb also …;Du coup, …;Zeit gewinnen;2
+Übrigens, …;Au fait, …;Zeit gewinnen;2
+…, so ist das.;…, voilà.;Zeit gewinnen;2
+Wissen Sie, was ich meine?;Vous voyez ce que je veux dire ?;Zeit gewinnen;2
+Verstehen Sie?;Vous voyez ?;Zeit gewinnen;2
+Moment, ich fange noch mal an.;Attendez, je recommence.;Zeit gewinnen;2
+Ich versuche, es zu erklären.;Je vais essayer de vous expliquer.;Zeit gewinnen;2
+Das ist schwer zu erklären.;C'est compliqué à expliquer.;Zeit gewinnen;2
+Verstanden, geht klar.;Entendu.;Reagieren;2
+Ist notiert.;C'est noté.;Reagieren;2
+Ganz genau.;Exactement.;Reagieren;2
+Absolut.;Tout à fait.;Reagieren;2
+Stimmt.;C'est vrai.;Reagieren;2
+Da stimme ich zu.;Je suis d'accord.;Reagieren;2
+Ich verstehe, aha.;Je vois.;Reagieren;2
+Ich glaube schon.;Je crois que oui.;Reagieren;2
+Ich glaube nicht.;Je ne crois pas.;Reagieren;2
+Nicht wirklich.;Pas vraiment.;Reagieren;2
+Überhaupt nicht.;Pas du tout.;Reagieren;2
+Kommt drauf an.;Ça dépend.;Reagieren;2
+Wie Sie möchten.;Comme vous voulez.;Reagieren;2
+Mal sehen.;On verra.;Reagieren;2
+Ich weiß nicht so recht.;Je ne sais pas trop.;Reagieren;2
+Keine Ahnung.;Aucune idée.;Reagieren;2
+Nein danke, das passt so.;Non, ça ira, merci.;Ablehnen & Einschränken;2
+Brauche ich nicht, danke.;Je n'en ai pas besoin, merci.;Ablehnen & Einschränken;2
+Nicht jetzt, danke.;Pas maintenant, merci.;Ablehnen & Einschränken;2
+Ich überlege es mir noch.;Je vais réfléchir.;Ablehnen & Einschränken;2
+Ich hätte lieber etwas anderes.;Je préfère autre chose.;Ablehnen & Einschränken;2
+Nur ein bisschen, bitte.;Juste un peu, s'il vous plaît.;Ablehnen & Einschränken;2
+Das reicht, danke.;Ça suffit, merci.;Ablehnen & Einschränken;2
+Tut mir leid, das geht nicht.;Désolé, ce n'est pas possible.;Ablehnen & Einschränken;2
+Bitte sehr, gern geschehen.;Je vous en prie.;Höflich & idiomatisch;2
+Hallo! / Tschüss! (locker);Salut !;Höflich & idiomatisch;2
+Was bin ich Ihnen schuldig?;Je vous dois combien ?;Bitten & Fragen;2
+Können Sie mir den Weg zu … zeigen?;Vous pouvez m'indiquer le chemin pour … ?;Bitten & Fragen;2
+Wie funktioniert das?;Ça marche comment ?;Bitten & Fragen;2
+Darf man hier …?;On peut … ici ?;Bitten & Fragen;2
+Stört es Sie, wenn …?;Ça vous dérange si … ?;Bitten & Fragen;2
+Könnten Sie …?;Est-ce que vous pourriez … ?;Bitten & Fragen;2
+Wäre das möglich?;Ce serait possible ?;Bitten & Fragen;2
+Muss ich mich hier anstellen?;Il faut faire la queue ici ?;Bitten & Fragen;2
+Was wünschen Sie?;Vous désirez ?;Was man gefragt wird;2
+Was brauchen Sie?;Qu'est-ce qu'il vous faut ?;Was man gefragt wird;2
+Werden Sie schon bedient?;On s'occupe de vous ?;Was man gefragt wird;2
+Ist es so recht?;Ça va comme ça ?;Was man gefragt wird;2
+Geben Sie Ihre PIN ein, bitte.;Tapez votre code, s'il vous plaît.;Was man gefragt wird;2
+Haben Sie Kleingeld?;Vous avez de la monnaie ?;Was man gefragt wird;2
+Wir haben geschlossen.;C'est fermé.;Was man gefragt wird;2
+Drinnen oder draußen?;En salle ou en terrasse ?;Was man gefragt wird;2
+Was darf ich Ihnen bringen?;Qu'est-ce que je vous sers ?;Was man gefragt wird;2
+Bitte warten Sie einen Moment.;Patientez un instant.;Was man gefragt wird;2
+Können Sie dieses Formular ausfüllen?;Vous pouvez remplir ce formulaire ?;Was man gefragt wird;2
+Was stimmt nicht?;Qu'est-ce qui ne va pas ?;Was man gefragt wird;2
+Kommen Sie zurecht?;Ça va aller ?;Was man gefragt wird;2
+Gibt es ein Problem?;Il y a un problème ?;Was man gefragt wird;2
+Auf der Rechnung ist ein Fehler.;Il y a une erreur dans l'addition.;Missverständnisse;2
+Das hatte ich nicht.;Je n'ai pas pris ça.;Missverständnisse;2
+Ich hatte ohne … bestellt.;J'ai demandé sans …;Missverständnisse;2
+Es fehlt …;Il manque …;Missverständnisse;2
+Ich glaube, Sie haben sich vertan.;Je crois que vous vous êtes trompé.;Missverständnisse;2
+Ich habe mich geirrt.;Je me suis trompé.;Missverständnisse;2
+Nein, nicht das, das andere.;Non, pas celui-là, l'autre.;Missverständnisse;2
+Dieses hier?;Celui-ci ?;Missverständnisse;2
+Nein, daneben.;Non, à côté.;Missverständnisse;2
+Ich dachte, …;Je pensais que …;Missverständnisse;2
+Das wollte ich nicht sagen.;Ce n'est pas ce que je voulais dire.;Missverständnisse;2
+Ich habe mich falsch ausgedrückt.;Je me suis mal exprimé.;Missverständnisse;2
+Entschuldigung, ich habe Sie falsch verstanden.;Pardon, je vous ai mal compris.;Missverständnisse;2
+Wir haben uns missverstanden.;On s'est mal compris.;Missverständnisse;2
+Entschuldigung, das war ein Missverständnis.;Désolé, c'était un malentendu.;Missverständnisse;2
+Ich wollte nur …;Je voulais juste …;Missverständnisse;2
+Nein, nur eins.;Non, un seul.;Missverständnisse;2
+Können Sie das nachprüfen?;Vous pouvez vérifier ?;Missverständnisse;2
+Oh, Entschuldigung, mein Fehler.;Oh, pardon, c'est ma faute.;Missverständnisse;2
+Kein Problem, das kann passieren.;Pas de souci, ça arrive.;Missverständnisse;2
+Ich weiß nicht, wo ich bin.;Je ne sais pas où je suis.;Hilfe & Probleme;2
+Spricht hier jemand Englisch?;Il y a quelqu'un qui parle anglais ?;Hilfe & Probleme;2
+Wohin muss ich gehen?;Je dois aller où ?;Hilfe & Probleme;2
+Ich habe … verloren.;J'ai perdu …;Hilfe & Probleme;2
+Ich finde … nicht mehr.;Je ne trouve plus …;Hilfe & Probleme;2
+Mir wurde der Geldbeutel gestohlen.;On m'a volé mon portefeuille.;Hilfe & Probleme;2
+Hier tut es weh.;J'ai mal ici.;Hilfe & Probleme;2
+Ich bin allergisch gegen …;Je suis allergique à …;Hilfe & Probleme;2
+Es ist dringend.;C'est urgent.;Hilfe & Probleme;2
+Rufen Sie einen Arzt!;Appelez un médecin !;Hilfe & Probleme;2
+Hilfe!;Au secours !;Hilfe & Probleme;2
+Was passiert hier?;Qu'est-ce qui se passe ?;Hilfe & Probleme;2
+Sind Sie von hier?;Vous êtes d'ici ?;Gespräch beginnen & beenden;2
+Es war nett, mit Ihnen zu plaudern.;C'était sympa de discuter.;Gespräch beginnen & beenden;2
+Wer spricht da?;Qui est à l'appareil ?;Telefon & Nachrichten;2
+Ich rufe wegen … an.;J'appelle pour …;Telefon & Nachrichten;2
+Ich höre Sie schlecht.;Je vous entends mal.;Telefon & Nachrichten;2
+Die Verbindung bricht ab.;Ça coupe.;Telefon & Nachrichten;2
+Bleiben Sie dran.;Ne quittez pas.;Telefon & Nachrichten;2
+Ich rufe Sie zurück.;Je vous rappelle.;Telefon & Nachrichten;2
+Können Sie mich zurückrufen?;Vous pouvez me rappeler ?;Telefon & Nachrichten;2
+Können Sie mir das per SMS schicken?;Vous pouvez me l'envoyer par SMS ?;Telefon & Nachrichten;2
+Darf ich Sie kurz unterbrechen?;Je peux vous interrompre une seconde ?;Gespräch steuern;2
+Langsam, Schritt für Schritt, bitte.;Doucement, étape par étape, s'il vous plaît.;Gespräch steuern;2
+Können Sie mir das Wichtigste sagen?;Vous pouvez me dire l'essentiel ?;Gespräch steuern;2
+Also, kurz gesagt: ja oder nein?;Donc, en gros : oui ou non ?;Gespräch steuern;2
+Und was jetzt?;Et maintenant ?;Gespräch steuern;2
+Was ist der nächste Schritt?;C'est quoi, la prochaine étape ?;Gespräch steuern;2
+Habe ich etwas vergessen?;J'ai oublié quelque chose ?;Gespräch steuern;2
+Muss ich noch etwas machen?;Je dois faire autre chose ?;Gespräch steuern;2
+Ist das alles, was ich brauche?;C'est tout ce qu'il me faut ?;Gespräch steuern;2
+Wann genau?;Quand exactement ?;Gespräch steuern;2
+Welches davon?;Lequel ?;Gespräch steuern;2
+Jetzt gleich oder später?;Maintenant ou plus tard ?;Gespräch steuern;2
+Sie haben recht.;Vous avez raison.;Gespräch steuern;2
+Was würden Sie an meiner Stelle machen?;Vous feriez quoi, à ma place ?;Gespräch steuern;2
+Was ist am einfachsten?;Qu'est-ce qui est le plus simple ?;Gespräch steuern;2
+Gibt es eine andere Lösung?;Il y a une autre solution ?;Gespräch steuern;2
+Geht das auch anders?;On peut faire autrement ?;Gespräch steuern;2
+Können Sie mir ein Zeichen geben, wenn …?;Vous pouvez me faire signe quand … ?;Gespräch steuern;2
+Kostet das extra?;C'est en supplément ?;Regeln & Abläufe;2
+Brauche ich ein Ticket?;Il faut un ticket ?;Regeln & Abläufe;2
+Muss ich vorher bezahlen?;Il faut payer avant ?;Regeln & Abläufe;2
+Wo unterschreibe ich?;Je signe où ?;Regeln & Abläufe;2
+Was muss ich hier eintragen?;Qu'est-ce que je dois mettre ici ?;Regeln & Abläufe;2
+Ist das Pflicht?;C'est obligatoire ?;Regeln & Abläufe;2
+Ist das erlaubt?;C'est autorisé ?;Regeln & Abläufe;2
+Bis wann ist das gültig?;C'est valable jusqu'à quand ?;Regeln & Abläufe;2
+Wo bekomme ich Auskunft?;Où est-ce que je peux me renseigner ?;Regeln & Abläufe;2
+Ist das hier der Eingang?;C'est bien l'entrée ici ?;Regeln & Abläufe;2
+Eine Frage noch.;Encore une question.;Gespräch beginnen & beenden;2
+Das war alles, was ich wissen wollte, danke.;C'est tout ce que je voulais savoir, merci.;Gespräch beginnen & beenden;2
+Das hilft mir sehr, danke.;Ça m'aide beaucoup, merci.;Gespräch beginnen & beenden;2
+Ich komme später wieder.;Je repasserai plus tard.;Gespräch beginnen & beenden;2
+Ich lasse Sie dann mal.;Je vous laisse.;Gespräch beginnen & beenden;2
+Können Sie mir eine E-Mail schreiben?;Vous pouvez m'écrire un e-mail ?;Telefon & Nachrichten;2
+Können Sie die Nummer langsam wiederholen?;Vous pouvez répéter le numéro lentement ?;Telefon & Nachrichten;2
+Gibt es das auch auf Englisch?;Il y a une version en anglais ?;Sprachhilfe;2
+Haben Sie die Speisekarte auf Englisch?;Vous avez la carte en anglais ?;Sprachhilfe;2
+Können Sie mir das übersetzen?;Vous pouvez me traduire ça ?;Sprachhilfe;2
+Das ist zum … da.;Ça sert à …;Umschreiben;2
+Das ist der Moment, in dem …;C'est le moment où …;Umschreiben;2
+Das macht man, wenn …;C'est ce qu'on fait quand …;Umschreiben;2
+Das sagt man, wenn …;C'est ce qu'on dit quand …;Umschreiben;2
+Wie …, nur größer.;C'est comme …, mais en plus grand.;Umschreiben;2
+Fast wie …;Presque comme …;Umschreiben;2
+Es ist zwischen … und …;C'est entre … et …;Umschreiben;2
+Das ist ein Teil von …;C'est une partie de …;Umschreiben;2
+Das gehört zu …;Ça va avec …;Umschreiben;2
+Man findet es in …;On le trouve dans …;Umschreiben;2
+Man braucht es für …;On en a besoin pour …;Umschreiben;2
+Man kann es essen.;Ça se mange.;Umschreiben;2
+Man trägt es (am Körper).;Ça se porte.;Umschreiben;2
+Das ist das Verb für …;C'est le verbe pour …;Umschreiben;2
+Das ist ein Wort für …;C'est un mot pour dire …;Umschreiben;2
+Auf Deutsch heißt es …;En allemand, c'est …;Umschreiben;2
+Es fängt mit „…“ an.;Ça commence par « … ».;Umschreiben;2
+Ich zeichne es Ihnen auf.;Je vais vous le dessiner.;Umschreiben;2
+Ich zeige es Ihnen mit den Händen.;Je vais vous montrer avec les mains.;Umschreiben;2
+Ich zeige Ihnen ein Foto.;Je vais vous montrer une photo.;Umschreiben;2
+Anders gesagt, …;Autrement dit, …;Umschreiben;2
+Grob gesagt, …;En gros, …;Umschreiben;2
+Ich verstehe mehr oder weniger.;Je comprends plus ou moins.;Umschreiben;2
+Es ist lang und dünn.;C'est long et fin.;Beschreiben;2
+Es ist rund wie ein Ball.;C'est rond, comme une balle.;Beschreiben;2
+Es ist aus Metall.;C'est en métal.;Beschreiben;2
+Es ist aus Plastik.;C'est en plastique.;Beschreiben;2
+Es ist aus Holz.;C'est en bois.;Beschreiben;2
+Das ist mir zu schwer.;C'est trop lourd pour moi.;Beschreiben;2
+Es ist klein und leicht.;C'est petit et léger.;Beschreiben;2
+Ist das süß oder salzig?;C'est sucré ou salé ?;Beschreiben;2
+Das ist etwas zu salzig.;C'est un peu trop salé.;Beschreiben;2
+Es schmeckt nach …;Ça a le goût de …;Beschreiben;2
+Ein bisschen mehr …;Un peu plus …;Beschreiben;2
+Ein bisschen weniger …;Un peu moins …;Beschreiben;2
+Nicht zu …;Pas trop …;Beschreiben;2
+Dasselbe, aber in …;Le même, mais en …;Beschreiben;2
+Das neben …;Celui à côté de …;Beschreiben;2
+Das obere.;Celui du haut.;Beschreiben;2
+Das untere.;Celui du bas.;Beschreiben;2
+Das linke.;Celui de gauche.;Beschreiben;2
+Das rechte.;Celui de droite.;Beschreiben;2
+Das da hinten.;Celui-là, au fond.;Beschreiben;2
+Das kleinste, bitte.;Le plus petit, s'il vous plaît.;Beschreiben;2
+Was ist das für ein Dings?;C'est quoi, ce machin ?;Allzweckwörter im Satz;2
+Haben Sie ein Werkzeug, um das zu reparieren?;Vous avez un outil pour réparer ça ?;Allzweckwörter im Satz;2
+Haben Sie ein Mittel gegen Mücken?;Vous avez un produit contre les moustiques ?;Allzweckwörter im Satz;2
+Ist das eine Spezialität von hier?;C'est une spécialité d'ici ?;Allzweckwörter im Satz;2
+Was für ein Gericht ist das?;C'est quel genre de plat ?;Allzweckwörter im Satz;2
+Haben Sie alkoholfreie Getränke?;Vous avez des boissons sans alcool ?;Allzweckwörter im Satz;2
+Haben Sie etwas gegen Kopfschmerzen?;Vous avez un médicament contre le mal de tête ?;Allzweckwörter im Satz;2
+In welchem Raum ist das?;C'est dans quelle pièce ?;Allzweckwörter im Satz;2
+In welchem Gebäude ist das?;C'est dans quel bâtiment ?;Allzweckwörter im Satz;2
+Ich suche die zuständige Person.;Je cherche la personne responsable.;Allzweckwörter im Satz;2
+Auf welcher Seite ist das?;C'est de quel côté ?;Allzweckwörter im Satz;2
+Das in der Mitte.;Celui du milieu.;Allzweckwörter im Satz;2
+Können Sie das reparieren?;Vous pouvez le réparer ?;Allzweckwörter im Satz;2
+Kann ich den Platz wechseln?;Je peux changer de place ?;Allzweckwörter im Satz;2
+Können Sie die Zwiebeln weglassen?;Vous pouvez enlever les oignons ?;Allzweckwörter im Satz;2
+Können Sie noch … dazutun?;Vous pouvez ajouter … ?;Allzweckwörter im Satz;2
+Wie macht man das Licht an?;Comment on allume la lumière ?;Allzweckwörter im Satz;2
+Wie schaltet man das aus?;Comment on éteint ça ?;Allzweckwörter im Satz;2
+Können Sie mir beim Ausfüllen helfen?;Vous pouvez m'aider à remplir ça ?;Allzweckwörter im Satz;2
+Können Sie es mir schicken?;Vous pouvez me l'envoyer ?;Allzweckwörter im Satz;2
+Wann muss ich es zurückgeben?;Je dois le rendre quand ?;Allzweckwörter im Satz;2
+Können Sie mir folgen?;Vous me suivez ?;Gespräch steuern;2
+Ist das für Sie verständlich?;C'est clair pour vous ?;Gespräch steuern;2
+Geht es auch einfacher?;On peut faire plus simple ?;Gespräch steuern;2
+Lassen Sie mich ausreden.;Laissez-moi finir.;Gespräch steuern;2
+Die Frage ist …;La question, c'est …;Gespräch steuern;2
+Ich sage es noch mal einfacher.;Je recommence plus simplement.;Gespräch steuern;2
+Können Sie mit Ja oder Nein antworten?;Vous pouvez répondre par oui ou par non ?;Gespräch steuern;2
+Können Sie darauf zeigen?;Vous pouvez me montrer du doigt ?;Gespräch steuern;2
+Moment, das fällt mir gleich wieder ein.;Attendez, ça va me revenir.;Zeit gewinnen;2
+Ich weiß nicht mehr, wie man das sagt.;Je ne sais plus comment on dit.;Zeit gewinnen;2
+Können Sie kürzere Sätze machen?;Vous pouvez faire des phrases plus courtes ?;Nicht verstanden;2
+Also ja?;Donc, c'est oui ?;Nicht verstanden;2
+Also nein?;Donc, c'est non ?;Nicht verstanden;2
+Ist das jetzt okay oder nicht?;Ça, c'est bon ou pas ?;Nicht verstanden;2
+Ist das etwas Gutes oder Schlechtes?;C'est positif ou négatif ?;Nicht verstanden;2
+Wie nennt man den Ort, wo …?;Comment on appelle l'endroit où … ?;Umschreiben;2
+Gibt es ein Wort für …?;Il y a un mot pour … ?;Umschreiben;2
+Wie ein …, nur für …;C'est comme un …, mais pour …;Umschreiben;2
+Das erste links.;Le premier à gauche.;Beschreiben;2
+Wie kommt man am einfachsten hin?;C'est quoi, le plus simple pour y aller ?;Allzweckwörter im Satz;2
+Das ist am Ende der Straße.;C'est au bout de la rue.;Allzweckwörter im Satz;2
+Kann ich mein Handy hier einstecken?;Je peux brancher mon téléphone ici ?;Allzweckwörter im Satz;2
+Ich habe im Bus einen Gegenstand liegen lassen.;J'ai oublié un objet dans le bus.;Allzweckwörter im Satz;3
+Ich brauche etwas Warmes zum Anziehen.;J'ai besoin d'un vêtement chaud.;Allzweckwörter im Satz;3
+Ich weiß nicht, ob ich Ihnen folgen kann.;Je ne suis pas sûr de vous suivre.;Nicht verstanden;3
+Können Sie ein Beispiel geben?;Vous pouvez me donner un exemple ?;Nicht verstanden;3
+Sprechen Sie ruhig Französisch mit mir, das hilft mir.;Parlez-moi en français, ça m'aide.;Sprachhilfe;3
+Gibt es ein anderes Wort dafür?;Il y a un autre mot pour ça ?;Sprachhilfe;3
+Ist das männlich oder weiblich?;C'est masculin ou féminin ?;Sprachhilfe;3
+Sagt man „le“ oder „la“?;On dit « le » ou « la » ?;Sprachhilfe;3
+Ich benutze eine Übersetzungs-App.;J'utilise une appli de traduction.;Sprachhilfe;3
+Das ist nicht der ausgeschriebene Preis.;Ce n'est pas le prix affiché.;Missverständnisse;3
+Ich habe mich im … vertan (z. B. Bus).;Je me suis trompé de …;Missverständnisse;3
+Ich will Sie nicht länger aufhalten.;Je ne vous retiens pas plus longtemps.;Gespräch beginnen & beenden;3
+Wen darf ich melden?;C'est de la part de qui ?;Telefon & Nachrichten;3
+Ich verbinde Sie.;Je vous le passe.;Telefon & Nachrichten;3
+Zusammengefasst: …;Pour résumer : …;Gespräch steuern;3
+Zeigen Sie es mir lieber, statt es zu erklären.;Montrez-moi plutôt, c'est plus simple.;Gespräch steuern;3
+Ich vertraue Ihnen.;Je vous fais confiance.;Gespräch steuern;3
+Kann ich das später noch ändern?;Je peux le modifier plus tard ?;Regeln & Abläufe;3
+Muss ich das ausdrucken?;Il faut l'imprimer ?;Regeln & Abläufe;3
+Können Sie es mir einkreisen?;Vous pouvez me l'entourer ?;Gespräch steuern;3
+Man tut es in …;On le met dans …;Umschreiben;3
+Man kann es trinken.;Ça se boit.;Umschreiben;3
+Man öffnet es so.;Ça s'ouvre comme ça.;Umschreiben;3
+Das ist so eine Art kleiner Kuchen. (locker);C'est genre un petit gâteau.;Umschreiben;3
+Das ist eine kleine viereckige Schachtel.;C'est une petite boîte carrée.;Beschreiben;3
+Es ist flach wie ein Teller.;C'est plat, comme une assiette.;Beschreiben;3
+Vorsicht, das ist spitz.;Attention, c'est pointu.;Beschreiben;3
+Es ist aus Stoff.;C'est en tissu.;Beschreiben;3
+Es ist aus Glas.;C'est en verre.;Beschreiben;3
+Es ist aus Papier.;C'est en papier.;Beschreiben;3
+Es ist weich wie ein Kissen.;C'est mou, comme un coussin.;Beschreiben;3
+Das ist zu fest, ich bekomme es nicht auf.;C'est trop dur, je n'arrive pas à l'ouvrir.;Beschreiben;3
+Es riecht wie …;Ça sent comme …;Beschreiben;3
+Es hat dieselbe Farbe wie …;C'est de la même couleur que …;Beschreiben;3
+Das ist ein elektrisches Gerät.;C'est un appareil électrique.;Beschreiben;3
+Da fehlt ein Stück.;Il en manque un morceau.;Beschreiben;3
+Ist das das letzte?;C'est le dernier ?;Beschreiben;3
+Ich bin noch nicht fertig.;Je n'ai pas fini.;Gespräch steuern;3
+Bitte Wort für Wort.;Un mot à la fois, s'il vous plaît.;Nicht verstanden;3
+Ist das ein Nomen oder ein Verb?;C'est un nom ou un verbe ?;Nicht verstanden;3
+Ist das eine Redewendung?;C'est une expression ?;Nicht verstanden;3
+Sagt man das oft?;Ça se dit souvent ?;Nicht verstanden;3
+Ist das dasselbe Wort wie im Englischen?;C'est le même mot qu'en anglais ?;Umschreiben;3
