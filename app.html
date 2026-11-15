@@ -311,7 +311,8 @@ b.hot{color:var(--bad)}
   .feedback{gap:8px;padding-top:12px}
   .readout{font-size:11.5px;gap:2px 12px}
   .hint{display:none}
-  .top{position:static}
+  /* Abstand zur Statusleiste und Dynamic Island: Sicherheitsbereich plus etwas Luft, mindestens 14px */
+  .top{position:static;padding-top:max(14px,calc(env(safe-area-inset-top,0px) + 10px))}
   .brandname{display:none}
   .top-inner{gap:6px}
   .tab{padding:10px 7px;font-size:14px}
@@ -1621,25 +1622,39 @@ function show(v){
 // nicht in Eingabefeldern, offenen Dialogen und Bereichen, die selbst waagerecht scrollen (Tabellen, Formeln).
 // Links vom Lernen liegt die Deck-Übersicht (Logo), rechts folgen Überblick, Wörter, Daten, Algorithmus.
 const TAB_ORDER=['decks','learn','overview','words','data','algo'];
-let swipe=null;
+let swipe=null,swipeEnd=0;
+// Als Home-Bildschirm-App gibt es keine Zurück-Geste von iOS, dort zählt auch ein Wisch direkt vom Rand.
+const standalone=!!(navigator.standalone||matchMedia('(display-mode: standalone)').matches);
 function hScrollable(el){for(;el&&el!==document.body;el=el.parentElement){if(el.scrollWidth>el.clientWidth+2&&/auto|scroll/.test(getComputedStyle(el).overflowX))return true}return false}
 document.addEventListener('touchstart',e=>{
   swipe=null;if(e.touches.length!==1)return;
   const t=e.touches[0],tg=e.target;
-  if(t.clientX<24||t.clientX>innerWidth-24)return;
+  if(!standalone&&(t.clientX<24||t.clientX>innerWidth-24))return;
   if(document.getElementById('overlay').innerHTML||tg.closest('input,textarea,select,.tabs')||hScrollable(tg))return;
-  swipe={x:t.clientX,y:t.clientY,t:Date.now()};
+  swipe={x:t.clientX,y:t.clientY,lx:t.clientX,ly:t.clientY,t:Date.now(),lock:null};
 },{passive:true});
-document.addEventListener('touchend',e=>{
-  if(!swipe)return;const s=swipe;swipe=null;
-  const t=e.changedTouches[0],dx=t.clientX-s.x,dy=t.clientY-s.y;
-  if(Date.now()-s.t>700||Math.abs(dx)<70||Math.abs(dy)>Math.abs(dx)*0.5)return;
+// Sobald die Bewegung klar waagerecht ist, gehört die Geste dem Tab-Wechsel: kein Scrollen mehr,
+// damit iOS sie nicht als Scrollen übernimmt und abbricht (das passierte vor allem über den Antwortknöpfen).
+document.addEventListener('touchmove',e=>{
+  if(!swipe)return;const t=e.touches[0];swipe.lx=t.clientX;swipe.ly=t.clientY;
+  const dx=t.clientX-swipe.x,dy=t.clientY-swipe.y;
+  if(!swipe.lock&&(Math.abs(dx)>10||Math.abs(dy)>10))swipe.lock=Math.abs(dx)>Math.abs(dy)*1.2?'h':'v';
+  if(swipe.lock==='v'){swipe=null;return}
+  if(swipe.lock==='h'&&e.cancelable)e.preventDefault();
+},{passive:false});
+function swipeFinish(x,y){
+  const s=swipe;swipe=null;if(!s||s.lock!=='h')return;
+  swipeEnd=Date.now();   // der Klick, den iOS nach dem Loslassen evtl. noch schickt, wählt keine Antwort
+  const dx=x-s.x,dy=y-s.y;
+  if(Date.now()-s.t>900||Math.abs(dx)<50||Math.abs(dy)>Math.abs(dx)*0.6)return;
   const i=TAB_ORDER.indexOf(view),j=i+(dx<0?1:-1);
   if(i<0||j<0||j>=TAB_ORDER.length)return;
   show(TAB_ORDER[j]);scrollTo(0,0);
   const sec=document.getElementById('v-'+TAB_ORDER[j]);sec.classList.remove('swipe-l','swipe-r');void sec.offsetWidth;sec.classList.add(dx<0?'swipe-l':'swipe-r');
-},{passive:true});
-document.addEventListener('touchcancel',()=>{swipe=null},{passive:true});
+}
+document.addEventListener('touchend',e=>{if(swipe){const t=e.changedTouches[0];swipeFinish(t.clientX,t.clientY)}},{passive:true});
+document.addEventListener('touchcancel',()=>{if(swipe)swipeFinish(swipe.lx,swipe.ly)},{passive:true});
+document.addEventListener('click',e=>{if(Date.now()-swipeEnd<500){e.preventDefault();e.stopPropagation()}},true);
 document.addEventListener('click',e=>{
   // Deck-Übersicht auf dem Handy: Tipp auf den Statusbalken zeigt die Anzahlen, der nächste Tipp schließt sie wieder
   const openPop=document.querySelector('.deckcard.pop-open'),bar=e.target.closest('.dc-stack');
