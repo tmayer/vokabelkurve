@@ -104,9 +104,9 @@ section.view{padding-top:22px;display:grid;gap:18px}
 .progress>i{display:block;height:100%;background:var(--accent);transition:width .25s}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 24px 24px;max-width:680px;width:100%;margin:0 auto;display:grid;gap:22px}
 .card-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
-.prompt{--pfs:clamp(30px,6vw,46px);font-family:var(--f-display);font-weight:700;font-size:var(--pfs);height:calc(var(--pfs) * 1.25);line-height:calc(var(--pfs) * 1.25);margin-top:8px;white-space:nowrap;overflow:hidden;text-align:center}
-.prompt.two-line{white-space:normal;display:flex;align-items:center;justify-content:center;line-height:1.1}
-.prompt-sub{text-align:center;color:var(--muted);font-size:13.5px}
+.prompt{--pfs:clamp(30px,6vw,46px);font-family:var(--f-display);font-weight:700;font-size:var(--pfs);height:calc(var(--pfs) * 2.1);margin-top:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;text-align:center;line-height:1.15}
+.prompt>span{flex:none;white-space:nowrap}
+.prompt.two-line>span{white-space:normal;max-width:100%;line-height:1.1}
 .opts{display:grid;gap:8px}
 .opt{display:flex;align-items:center;gap:14px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:12px 14px;font-size:17px;transition:border-color .12s,background .12s}
 @media (hover:hover) and (pointer:fine){.opt:hover:not([aria-disabled]){border-color:var(--accent);background:var(--accent-soft)}}
@@ -1140,18 +1140,18 @@ function learnStats(d){
   while(days.has(dk(t))){streak++;t-=DAY}
   return{today,learned,total:d.words.length,streak};
 }
-// Abgefragter Begriff bleibt einzeilig: Schrift schrittweise verkleinern, bis er passt (mindestens 13 px).
-// Passt er selbst dann nicht, bricht er innerhalb derselben festen Höhe um – die Karte ändert ihre Höhe nie.
+// Abgefragter Begriff: Die Fläche hat immer dieselbe Höhe (Platz für zwei Zeilen), damit nichts springt.
+// Erst einzeilig versuchen und dabei die Schrift höchstens auf 75 % verkleinern; passt es dann nicht,
+// zweizeilig umbrechen und die Schrift so weit verkleinern, bis der Text in die feste Höhe passt (mindestens 13 px).
 function fitPrompt(){
-  const el=document.querySelector('#v-learn .prompt');if(!el)return;
-  el.classList.remove('two-line');el.style.fontSize='';el.style.height='';
-  let fs=parseFloat(getComputedStyle(el).fontSize);
-  while(el.scrollWidth>el.clientWidth+1&&fs>13){fs-=1;el.style.fontSize=fs+'px'}
-  if(el.scrollWidth>el.clientWidth+1){
-    // zweizeilig in derselben Höhe: Schrift so wählen, dass zwei Zeilen hineinpassen
-    const H=el.getBoundingClientRect().height;
-    el.style.height=H+'px';el.classList.add('two-line');el.style.fontSize=Math.floor(H/2.3)+'px';
-  }
+  const el=document.querySelector('#v-learn .prompt'),sp=el&&el.firstElementChild;if(!sp)return;
+  el.classList.remove('two-line');el.style.fontSize='';
+  const base=parseFloat(getComputedStyle(el).fontSize),W=el.clientWidth,H=el.clientHeight;
+  let fs=base;
+  while(sp.scrollWidth>W+1&&fs>Math.max(13,base*.75)){fs-=1;el.style.fontSize=fs+'px'}
+  if(sp.scrollWidth<=W+1)return;
+  el.classList.add('two-line');fs=base;el.style.fontSize=fs+'px';
+  while((sp.offsetHeight>H+1||sp.scrollWidth>W+1)&&fs>13){fs-=1;el.style.fontSize=fs+'px'}
 }
 window.addEventListener('resize',()=>{if(view==='learn')fitPrompt()});
 function renderLearn(){
@@ -1205,7 +1205,7 @@ function renderLearn(){
     <div class="card${cur.answer?' answered':''}">
       <div class="card-head"><span class="eyebrow ch-deck"><button class="deckname" data-view="decks" title="Deck wechseln">${esc(deckLabel(d))}</button><span class="ch-dir">· ${esc(dirShort(d,cur.dir))}</span>${cur.w.tag?`<span class="ch-tag">· ${esc(cur.w.tag)}</span>`:''}</span>
         <span>${cur.extra?`<span class="muted" style="font-size:12.5px">${cur.extra==='new'?'über dem Tagesziel':'zusätzlich wiederholt'} · </span>`:''}${seen?pill(st)+` <span class="muted" style="font-size:12.5px;font-variant-numeric:tabular-nums">R ${pct(R)}</span>`:pill('new')}</span></div>
-      <div><div class="prompt">${esc(prm)}</div><div class="prompt-sub">Was heißt das auf ${esc(cur.dir===0?d.langB:d.langA)}?</div></div>
+      <div class="prompt"><span>${esc(prm)}</span></div>
       <div class="opts">${cur.opts.map((o,i)=>{let cls='';if(cur.answer){if(o.correct)cls='is-right';else if(i===cur.answer.idx)cls='is-wrong';else cls='is-dim'}return`<button class="opt ${cls}" data-opt="${i}"${cur.answer?' aria-disabled="true"':''}><kbd>${i+1}</kbd><span>${esc(o.text)}</span></button>`}).join('')}</div>
       ${cur.answer&&!cur.quick?`<div class="nextpanel">
       <button class="btn primary next${cur.answer.correct&&nextMode()==='delay'?' auto':''}" data-act="next" style="--auto:${AUTO_MS}ms"><span>Weiter</span><kbd>Enter</kbd></button>
