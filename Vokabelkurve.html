@@ -751,6 +751,7 @@ function newReverseToday(d){
 }
 function firstReview(c){return c&&c.reps?(c.reps===c.h.length?c.h[0][0]:0):Infinity}
 function pickNext(ignoreRecent){
+  if(session.mix)return pickMix(ignoreRecent);
   const d=deck(),t=now(),st=db.settings,ses=session,sod=startOfToday();
   // 1) falsch beantwortete Karten kommen nach drei anderen noch einmal
   const si=ses.soon.findIndex(x=>x.at<=ses.n);
@@ -792,18 +793,41 @@ function pickNext(ignoreRecent){
   if(anySeen.length)return{...minR(anySeen),extra:'practice'};
   return ignoreRecent?null:pickNext(true);
 }
-function startSession(extraMode){
-  session={n:0,right:0,wrong:0,recent:[],soon:[],sinceNew:NEW_EVERY,stopped:false,cur:null,beforeR:expectedKnown(),extraMode:extraMode||null};
+// „Alle fälligen“ (Tipp auf „jetzt fällig“ in der Deck-Übersicht): fällige Karten aus allen Decks außer Ruhemodus,
+// unsicherste zuerst, ohne neue Wörter. Falsch beantwortete kommen wie sonst nach drei Karten noch einmal. Das aktive Deck bleibt dasselbe.
+const mixDecks=()=>db.decks.filter(d=>!isPaused(d)&&d.words.length>=5);
+function pickMix(ignoreRecent){
+  const ses=session,t=now(),dirs=dirsFor(db.settings.dirMode);
+  const si=ses.soon.findIndex(x=>x.at<=ses.n);
+  if(si>=0){const x=ses.soon.splice(si,1)[0];return{did:x.did,wid:x.wid,dir:x.dir,again:x.again}}
+  const recent=ignoreRecent?new Set():new Set(ses.recent);let best=null;
+  for(const d of mixDecks())for(const w of d.words){
+    if(recent.has(d.id+'\t'+w.id))continue;
+    for(const dir of dirs){const c=db.cards[key(d.id,w.id,dir)];if(!c||!c.reps||c.due>t)continue;
+      const k=curR(c,t)+(Math.random()-0.5)*0.04;if(!best||k<best.k)best={did:d.id,wid:w.id,dir,k}}
+  }
+  if(best)return best;
+  if(ses.soon.length){ses.soon.sort((a,b)=>a.at-b.at);const x=ses.soon.shift();return{did:x.did,wid:x.wid,dir:x.dir,again:x.again}}
+  return ignoreRecent?null:pickMix(true);
+}
+function mixDueCount(){
+  const t=now(),dirs=dirsFor(db.settings.dirMode);let n=0;
+  for(const d of mixDecks())for(const w of d.words)for(const dir of dirs){const c=db.cards[key(d.id,w.id,dir)];if(c&&c.reps&&c.due<=t)n++}
+  return n;
+}
+function startSession(extraMode,mix){
+  session={n:0,right:0,wrong:0,recent:[],soon:[],sinceNew:NEW_EVERY,stopped:false,cur:null,beforeR:mix?0:expectedKnown(),extraMode:extraMode||null,mix:!!mix};
   nextCard();
 }
 function nextCard(){
   clearTimeout(autoTimer);
-  const d=deck(),it=d&&pickNext(false);
-  const w=it&&d.words.find(x=>x.id===it.wid);
+  let d=deck(),it;
+  if(session.mix){it=pickNext(false);d=it&&db.decks.find(x=>x.id===it.did)}else it=d&&pickNext(false);
+  const w=it&&d&&d.words.find(x=>x.id===it.wid);
   if(!w){session.cur=null;renderLearn();return}
   const k=key(d.id,w.id,it.dir),c=db.cards[k];
-  session.recent.push(w.id);if(session.recent.length>Math.min(RECENT_MAX,Math.floor(d.words.length/3)))session.recent.shift();
-  session.cur={...it,w,k,opts:makeOptions(d,w,it.dir),shown:performance.now(),answer:null,grade:null,R0:curR(c,now()),st0:status(c),seen0:!!(c&&c.reps)};
+  session.recent.push(session.mix?d.id+'\t'+w.id:w.id);if(session.recent.length>(session.mix?RECENT_MAX:Math.min(RECENT_MAX,Math.floor(d.words.length/3))))session.recent.shift();
+  session.cur={...it,d,w,k,opts:makeOptions(d,w,it.dir),shown:performance.now(),answer:null,grade:null,R0:curR(c,now()),st0:status(c),seen0:!!(c&&c.reps)};
   renderLearn();
 }
 function article(s){const m=s.toLowerCase().match(/^(l'|l’|[a-zäöüéèàß]+\s)/);return m?m[1].trim():''}
@@ -828,7 +852,7 @@ function makeOptions(d,w,dir){
 function answer(idx){
   const cur=session&&session.cur;if(!cur||cur.answer)return;
   const ms=performance.now()-cur.shown,o=cur.opts[idx];if(!o)return;
-  const d=deck(),prev=db.cards[cur.k];
+  const d=cur.d,prev=db.cards[cur.k];
   // Zeit an der typischen Antwortzeit der jeweiligen Position messen
   const pm=posModel(),adj=pm.adjOf(ms,idx,cardLen(cur.k));
   // Sehr schnell falsch bei einem schon bekannten Wort: vermutlich vertippt. Zählt nicht, das Wort kommt nach 3 Karten noch einmal.
@@ -838,7 +862,7 @@ function answer(idx){
     cur.answer={idx,ms,adj,credit:ms-adj,correct:false,slip:true,rule:'sehr schnell falsch, vermutlich vertippt: zählt nicht, kommt gleich nochmal'};
     cur.grade=0;cur.prev=prev;cur.next=n;cur.t=t;
     session.n++;session.sinceNew=cur.isNew?0:session.sinceNew+1;
-    if((cur.again||0)<2)session.soon.push({wid:cur.w.id,dir:cur.dir,at:session.n+3,again:(cur.again||0)+1});
+    if((cur.again||0)<2)session.soon.push({did:cur.d.id,wid:cur.w.id,dir:cur.dir,at:session.n+3,again:(cur.again||0)+1});
     session.last={text:cur.dir===0?cur.w.a:cur.w.b,ok:false,ivl:'wenigen Karten'};
     renderLearn();return;
   }
@@ -857,7 +881,7 @@ function answer(idx){
   cur.answer={idx,ms,adj,credit:ms-adj,correct:o.correct,rule};cur.grade=g;cur.prev=prev;cur.next=n;cur.t=t;
   session.n++;if(o.correct)session.right++;else session.wrong++;
   session.sinceNew=cur.isNew?0:session.sinceNew+1;
-  if(g===1&&(cur.again||0)<2)session.soon.push({wid:cur.w.id,dir:cur.dir,at:session.n+3,again:(cur.again||0)+1});
+  if(g===1&&(cur.again||0)<2)session.soon.push({did:cur.d.id,wid:cur.w.id,dir:cur.dir,at:session.n+3,again:(cur.again||0)+1});
   session.last={text:cur.dir===0?cur.w.a:cur.w.b,ok:o.correct,ivl:fmtIvl(n.due-t),ref:cur};session.lastOpen=false;
   const nm=nextMode();
   // richtig + „sofort“: Antwort nur kurz grün aufleuchten lassen, dann direkt die nächste Karte
@@ -869,14 +893,14 @@ function answer(idx){
 // damit bewusstes Aufgeben die Zeitstatistik (Positions-Anker, Grenzen, Vertipper) nicht verfälscht.
 function dunno(){
   const cur=session&&session.cur;if(!cur||cur.answer)return;
-  const ms=performance.now()-cur.shown,d=deck(),prev=db.cards[cur.k],t=now();
+  const ms=performance.now()-cur.shown,d=cur.d,prev=db.cards[cur.k],t=now();
   const n=applyReview(prev,1,t,db.settings.retention);
   if(n.h.length>HIST_MAX)n.h=n.h.slice(-HIST_MAX);
   db.cards[cur.k]=n;posCache=null;save({card:[d.id,cur.w.id,cur.dir]});
   cur.answer={idx:-1,ms,adj:ms,credit:0,correct:false,dunno:true,rule:'„weiß nicht“: zählt wie falsch, kommt nach 3 Karten noch einmal'};
   cur.grade=1;cur.prev=prev;cur.next=n;cur.t=t;
   session.n++;session.wrong++;session.sinceNew=cur.isNew?0:session.sinceNew+1;
-  if((cur.again||0)<2)session.soon.push({wid:cur.w.id,dir:cur.dir,at:session.n+3,again:(cur.again||0)+1});
+  if((cur.again||0)<2)session.soon.push({did:cur.d.id,wid:cur.w.id,dir:cur.dir,at:session.n+3,again:(cur.again||0)+1});
   session.last={text:cur.dir===0?cur.w.a:cur.w.b,ok:false,dunno:true,ivl:fmtIvl(n.due-t),ref:cur};session.lastOpen=false;
   renderLearn();
 }
@@ -890,12 +914,12 @@ function lastGrade(v){
   else{
     const g=+v;
     if(g!==pc.grade){
-      const d=deck(),n=applyReview(pc.prev,g,pc.t,db.settings.retention);
+      const d=pc.d,n=applyReview(pc.prev,g,pc.t,db.settings.retention);
       // Rohzeit und Position wie bei der automatischen Bewertung, dazu Markierung „von Hand“ (bleibt bei späteren Neuberechnungen erhalten)
       n.h[n.h.length-1]=n.h[n.h.length-1].concat([Math.round(Math.min(pc.answer.ms,1e7)),pc.answer.idx,1]);
       if(n.h.length>HIST_MAX)n.h=n.h.slice(-HIST_MAX);
       db.cards[pc.k]=n;posCache=null;save({card:[d.id,pc.w.id,pc.dir]});
-      if(g===1&&pc.grade!==1){session.right--;session.wrong++;if((pc.again||0)<2)session.soon.push({wid:pc.w.id,dir:pc.dir,at:session.n+3,again:(pc.again||0)+1})}
+      if(g===1&&pc.grade!==1){session.right--;session.wrong++;if((pc.again||0)<2)session.soon.push({did:pc.d.id,wid:pc.w.id,dir:pc.dir,at:session.n+3,again:(pc.again||0)+1})}
       if(g!==1&&pc.grade===1){session.right++;session.wrong--;session.soon=session.soon.filter(x=>!(x.wid===pc.w.id&&x.dir===pc.dir))}
       pc.grade=g;pc.next=n;L.ivl=fmtIvl(n.due-pc.t);
     }
@@ -1155,7 +1179,17 @@ function fitPrompt(){
 }
 window.addEventListener('resize',()=>{if(view==='learn')fitPrompt()});
 function renderLearn(){
-  const el=document.getElementById('v-learn'),d=deck();
+  const el=document.getElementById('v-learn'),mix=session&&session.mix,d=mix&&session.cur?session.cur.d:deck();
+  if(mix&&(session.stopped||!session.cur)){
+    const left=mixDueCount(),ad=deck();
+    el.innerHTML=`<div class="center-msg">
+      <p class="eyebrow">Alle fälligen Karten</p>
+      <h2>${session.stopped?'Pause':'Alles Fällige ist erledigt'}</h2>
+      <p class="muted">${session.n?`${session.n} ${session.n===1?'Karte':'Karten'} beantwortet, ${session.right} richtig. `:''}${left?`Noch ${left} fällig über alle Decks.`:'In keinem Deck ist gerade etwas fällig.'} Decks im Ruhemodus sind nicht dabei.</p>
+      <div class="row" style="justify-content:center">${left?'<button class="btn primary" data-act="startMix">Weiter mit allen fälligen</button>':''}${ad?`<button class="btn${left?'':' primary'}" data-act="start">Mit „${esc(deckLabel(ad))}“ lernen</button>`:''}<button class="btn" data-view="decks">Zur Deck-Übersicht</button></div>
+    </div>`;
+    return;
+  }
   if(!d){el.innerHTML=`<div class="center-msg"><h2>Noch kein Deck</h2>
     ${localOffer?`<p class="muted">In diesem Browser liegt noch ein Lernstand von früher (${localSummary(localOffer)}). Du kannst ihn auf den Server übernehmen.</p><button class="btn primary" data-act="migrate">Lernstand übernehmen</button>`:''}
     <p class="muted">Lade unter „Daten &amp; Einstellungen“ eine CSV-Datei mit zwei Spalten hoch, zum Beispiel Deutsch und Französisch, oder starte mit dem Beispieldeck.</p>
@@ -1193,10 +1227,10 @@ function renderLearn(){
   }
   const todo=qc.due?`noch ${qc.due} fällig`:'nichts mehr fällig';
   el.innerHTML=`<div class="learnbar">
-      ${(()=>{const ls=learnStats(d);return`<div class="stats"><span><b>${ls.today}</b> heute</span><span>·</span><span><b>${ls.learned}</b>/${ls.total}<span class="long"> Wörter</span> gelernt</span>${ls.streak>1?`<span class="streak"><span class="dot">· </span><b>${ls.streak}</b> Tage in Folge gelernt</span>`:''}</div>`})()}
+      ${mix?`<div class="stats"><span><b>${session.n}</b> beantwortet</span><span>·</span><span><b>${session.right}</b> richtig</span></div>`:(()=>{const ls=learnStats(d);return`<div class="stats"><span><b>${ls.today}</b> heute</span><span>·</span><span><b>${ls.learned}</b>/${ls.total}<span class="long"> Wörter</span> gelernt</span>${ls.streak>1?`<span class="streak"><span class="dot">· </span><b>${ls.streak}</b> Tage in Folge gelernt</span>`:''}</div>`})()}
       <div class="row"><button class="btn small" data-act="stop">Aufhören</button></div>
     </div>
-    ${(()=>{const tp=todayPlan(d);return`<div class="todaybar"><button data-today="dueNow"><b>${tp.dueNow}</b> jetzt fällig</button><button data-today="dueToday"><b>${tp.later}</b> später heute</button><span><b>${tp.newLeft}</b> neu heute</span></div>`})()}
+    ${mix?`<div class="todaybar"><span><b class="hot">${mixDueCount()}</b> fällig in allen Decks</span><span>alle fälligen nacheinander</span></div>`:(()=>{const tp=todayPlan(d);return`<div class="todaybar"><button data-today="dueNow"><b>${tp.dueNow}</b> jetzt fällig</button><button data-today="dueToday"><b>${tp.later}</b> später heute</button><span><b>${tp.newLeft}</b> neu heute</span></div>`})()}
     ${(()=>{const L=session.last;if(!L)return'<div class="lastline">&nbsp;</div>';
       const pc=L.ref,can=pc&&pc.answer&&pc.answer.correct&&!cur.answer,g=pc&&pc.grade;
       if(can&&session.lastOpen)return`<div class="lastline"><span class="lt">Vorige Karte war:</span>${LAST_GRADES.map(([v,l])=>`<button class="lchg${v===g?' on':''}" data-lg="${v}">${l}</button>`).join('')}</div>`;
@@ -1365,7 +1399,7 @@ function renderDecks(){
   const sum=list.filter(x=>!x.paused).reduce((a,x)=>({now:a.now+x.tp.dueNow,later:a.later+x.tp.later,neu:a.neu+x.tp.newLeft}),{now:0,later:0,neu:0});
   el.innerHTML=`
     <div class="decksum"><div class="decksum-head"><p class="eyebrow">Heute über alle Decks</p><button class="btn small" data-reload="1" title="Zahlen, Decks und App neu laden">↻ Aktualisieren</button></div>
-      <div class="todaybar"><span><b class="hot">${sum.now}</b> jetzt fällig</span><span><b>${sum.later}</b> später heute</span><span><b>${sum.neu}</b> neu</span></div></div>
+      <div class="todaybar">${sum.now?`<button data-mix="1" title="Alle fälligen Karten aus allen Decks nacheinander abfragen"><b class="hot">${sum.now}</b> jetzt fällig ›</button>`:'<span><b>0</b> jetzt fällig</span>'}<span><b>${sum.later}</b> später heute</span><span><b>${sum.neu}</b> neu</span></div></div>
     <div class="deckcards">${list.map(x=>`<button class="deckcard${x.d.id===db.active?' active':''}${x.paused?' paused':''}" data-pick="${esc(x.d.id)}">
       <span class="dc-name">${esc(deckLabel(x.d))}${x.d.id===db.active?'<span class="dc-tag">aktiv</span>':''}${x.paused?'<span class="dc-tag dc-rest">Ruhemodus</span>':''}</span>
       <span class="dc-sub">${esc(dirShort(x.d,0))} · ${nf(x.learned)} von ${nf(x.d.words.length)} gelernt · zuletzt ${fmtAgo(x.last)}</span>
@@ -1685,6 +1719,7 @@ document.addEventListener('click',e=>{
   if(ds.dir){db.settings.dirMode=ds.dir;save();session=null;return renderLearn()}
   if(ds.cal!=null){calSel=+ds.cal;return renderDecks()}
   if(ds.ov){db.settings.ovMode=ds.ov;save();return renderOverview()}
+  if(ds.mix){startSession(false,true);return show('learn')}
   if(ds.pick){db.active=ds.pick;session=null;save();renderDeckSel();return show('learn')}
   if(ds.filter){wordFilter=ds.filter;return renderWords()}
   if(ds.today){wordFilter=ds.today;wordSort.k='due';wordSort.dir=1;return show('words')}
@@ -1707,6 +1742,7 @@ document.addEventListener('click',e=>{
   if(ds.sim){if(ds.sim==='reset')sim={c:null,t:0};else return simStep(+ds.sim);return renderAlgo()}
   switch(ds.act){
     case'start':return startSession(false);
+    case'startMix':return startSession(false,true);
     case'startReview':return startSession('review');
     case'next':return commit();
     case'stop':return stopLearning();
